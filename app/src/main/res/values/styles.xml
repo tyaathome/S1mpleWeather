@@ -1,0 +1,21 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+
+    <style name="TextSizeSmall">
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
+    <style name="TextSizeNormal">
+        <item name="android:textSize">@dimen/text_normal</item>
+    </style>
+
+    <style name="TextSizeLarge">
+        <item name="android:textSize">@dimen/text_large</item>
+    </style>
+
+</resources>
