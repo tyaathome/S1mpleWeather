@@ -1,13 +1,20 @@
-package com.tyaathome.s1mpleweather.model.bean.city;
+package com.tyaathome.s1mpleweather.model.RealmObject.city;
+
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
- * Created by tyaathome on 2018/3/1.
+ * Created by tyaathome on 2018/2/28.
  */
 
-public class LocationCityBean {
+public class LocationCityRealmBean extends RealmObject {
 
+    //主键
+    @PrimaryKey
+    private long key;
     // 城市id
     private String id;
+    // 父id
     private String parent_id;
     // 省
     private String province;
@@ -21,6 +28,14 @@ public class LocationCityBean {
     private double longitude;
     // 纬度
     private double latitude;
+
+    public long getKey() {
+        return key;
+    }
+
+    public void setKey(long key) {
+        this.key = key;
+    }
 
     public String getId() {
         return id;
@@ -85,5 +100,4 @@ public class LocationCityBean {
     public void setLatitude(double latitude) {
         this.latitude = latitude;
     }
-
 }

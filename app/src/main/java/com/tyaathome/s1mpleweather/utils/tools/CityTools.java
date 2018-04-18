@@ -3,9 +3,9 @@ package com.tyaathome.s1mpleweather.utils.tools;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.tyaathome.s1mpleweather.model.RealmObject.CityRealmBean;
-import com.tyaathome.s1mpleweather.model.RealmObject.CityList;
-import com.tyaathome.s1mpleweather.model.RealmObject.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.RealmObject.city.CityRealmBean;
+import com.tyaathome.s1mpleweather.model.RealmObject.city.CityList;
+import com.tyaathome.s1mpleweather.model.RealmObject.city.LocationCityRealmBean;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
 
 import java.io.InputStream;

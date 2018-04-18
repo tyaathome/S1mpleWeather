@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackDown;
+import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,6 +16,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Iterator;
 
+import io.realm.Realm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -95,14 +96,11 @@ public class MyConverterFactory extends Converter.Factory{
                 if (response == null) {
                     return null;
                 }
-                response.fillData(bodyJson);
-//                Context context = PcsInit.getInstance().getContext();
-//                if(context != null) {
-//                    synchronized (Lock) {
-//                        SQLiteDatabase db = DBHelper.getInstance(context).getReadableDatabase();
-//                        SqliteUtil.getInstance().setInfo(db, bodyName, bodyJson);
-//                    }
-//                }
+                try {
+                    response.fillData(Realm.getDefaultInstance(), new JSONObject(bodyJson));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
                 Log.e("Json", "down: " + json);
                 return response;
             }

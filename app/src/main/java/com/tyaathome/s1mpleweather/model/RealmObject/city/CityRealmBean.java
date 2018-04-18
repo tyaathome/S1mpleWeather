@@ -1,7 +1,4 @@
-package com.tyaathome.s1mpleweather.model.RealmObject;
-
-import com.tyaathome.s1mpleweather.model.RealmObject.impl.CityImpl;
-import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
+package com.tyaathome.s1mpleweather.model.RealmObject.city;
 
 import io.realm.RealmObject;
 
@@ -9,7 +6,7 @@ import io.realm.RealmObject;
  * Created by tyaathome on 2018/2/28.
  */
 
-public class CityRealmBean extends RealmObject implements CityImpl<CityBean> {
+public class CityRealmBean extends RealmObject {
     // 城市id
     private String id = "";
     // 父id
@@ -81,14 +78,4 @@ public class CityRealmBean extends RealmObject implements CityImpl<CityBean> {
         this.pinyin_simple = pinyin_simple;
     }
 
-    @Override
-    public CityBean getCityInfo() {
-        CityBean cityBean = new CityBean();
-        cityBean.setId(id);
-        cityBean.setParent_id(parent_id);
-        cityBean.setProvince(province);
-        cityBean.setCity(city);
-        cityBean.setCounty(county);
-        return cityBean;
-    }
 }

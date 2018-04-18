@@ -14,9 +14,10 @@ import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
-import com.tyaathome.s1mpleweather.model.RealmObject.CityRealmBean;
-import com.tyaathome.s1mpleweather.model.RealmObject.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.RealmObject.city.CityRealmBean;
+import com.tyaathome.s1mpleweather.model.RealmObject.city.LocationCityRealmBean;
 
+import io.reactivex.ObservableEmitter;
 import io.realm.Realm;
 
 /**
@@ -36,9 +37,11 @@ public class LocationTools {
     private static final long LOCATION_TIME = 5 * 60 * 1000;
     // 定位回调
     private OnCompleteListener mOnCompleteListener;
+    private ObservableEmitter emitter;
 
     private LocationTools(Context context) {
         mContext = context;
+        init();
     }
 
     public static synchronized LocationTools getInstance(Context context) {
@@ -48,7 +51,7 @@ public class LocationTools {
         return instance;
     }
 
-    public void init(AMapLocationListener aMapLocationListener) {
+    public void init() {
         if(mAMapLocationClient == null) {
             mAMapLocationClient = new AMapLocationClient((mContext));
         }
@@ -64,11 +67,34 @@ public class LocationTools {
 
     /**
      * 开始定位
-     * @param aMapLocationListener 高德地图定位回调
      */
     public void startLocation() {
         if(mAMapLocationClient != null) {
             mAMapLocationClient.startLocation();
+        }
+    }
+
+    /**
+     * 开始定位
+     * @param emitter
+     */
+    public void startLocation(ObservableEmitter emitter) {
+        startLocation();
+        this.emitter = emitter;
+    }
+
+    public void stopLocation(String message) {
+        if(mAMapLocationClient != null) {
+            mAMapLocationClient.stopLocation();
+        }
+        if(emitter != null && !emitter.isDisposed()) {
+            emitter.onError(new RuntimeException(message));
+        }
+    }
+
+    private void finishLocation() {
+        if(emitter != null && !emitter.isDisposed()) {
+            emitter.onComplete();
         }
     }
 
@@ -97,46 +123,49 @@ public class LocationTools {
         geocodeSearch.getFromLocationAsyn(regeocodeQuery);
     }
 
-//    /**
-//     * 定位回调
-//     */
-//    private AMapLocationListener aMapLocationListener = new AMapLocationListener() {
-//        @Override
-//        public void onLocationChanged(AMapLocation aMapLocation) {
-//            if(aMapLocation != null) {
-//                saveLocationCity(aMapLocation);
-//            } else {
-//                LocationCityRealmBean bean = Realm.getDefaultInstance().where(LocationCityRealmBean.class).findFirst();
-//                if(bean != null) {
-//                    searchLocation(bean.getLatitude(), bean.getLongitude());
-//                } else {
-//                    // TODO: 2018/3/1 第一次启动程序时定位失败处理(启动3次定位，如果3次定位都失败则跳转城市选择页面)
-////                    Observable.create(new ObservableOnSubscribe<Object>() {
-////                        @Override
-////                        public void subscribe(ObservableEmitter<Object> emitter) throws Exception {
-////                            startLocation();
-////                        }
-////                    }).retryWhen(new Function<Observable<Throwable>, ObservableSource<?>>() {
-////                        @Override
-////                        public ObservableSource<?> apply(Observable<Throwable> throwableObservable) throws Exception {
-////                            return throwableObservable.zipWith(Observable.range(1, 3), new BiFunction<Throwable, Integer, Integer>() {
-////
-////                                @Override
-////                                public Integer apply(Throwable throwable, Integer integer) throws Exception {
-////                                    return integer;
-////                                }
-////                            }).flatMap(new Function<Integer, ObservableSource<?>>() {
-////                                @Override
-////                                public ObservableSource<?> apply(Integer integer) throws Exception {
-////                                    return Observable.timer(integer, TimeUnit.SECONDS);
-////                                }
-////                            });
-////                        }
-////                    });
-//                }
-//            }
-//        }
-//    };
+    /**
+     * 保存定位城市
+     * @param aMapLocation 定位对象
+     */
+    private void saveLocationCity(AMapLocation aMapLocation) {
+        // 格式化地址
+        String province = aMapLocation.getProvince();
+        String city = aMapLocation.getCity();
+        String county = aMapLocation.getDistrict();
+        String street = aMapLocation.getAddress();
+        if (!TextUtils.isEmpty(county) && street.contains(county)) {
+            street = street.substring(street.indexOf(county)
+                    + county.length());
+        } else if (!TextUtils.isEmpty(city) && street.contains(city)) {
+            street = street.substring(street.indexOf(city)
+                    + county.length());
+        }
+        CityRealmBean bean = CityTools.getInstance(mContext).getCity(province, city, county);
+        LocationCityRealmBean locationCityRealmBean = new LocationCityRealmBean();
+        locationCityRealmBean.setId(bean.getId());
+        locationCityRealmBean.setParent_id(bean.getParent_id());
+        locationCityRealmBean.setProvince(bean.getProvince());
+        locationCityRealmBean.setCity(bean.getCity());
+        locationCityRealmBean.setCounty(bean.getCounty());
+        locationCityRealmBean.setStreet(street);
+        locationCityRealmBean.setLatitude(aMapLocation.getLatitude());
+        locationCityRealmBean.setLongitude(aMapLocation.getLongitude());
+        Realm.getDefaultInstance().beginTransaction();
+        Realm.getDefaultInstance().copyToRealmOrUpdate(locationCityRealmBean);
+        Realm.getDefaultInstance().commitTransaction();
+    }
+
+    private AMapLocationListener aMapLocationListener = new AMapLocationListener() {
+        @Override
+        public void onLocationChanged(AMapLocation aMapLocation) {
+            if(aMapLocation == null) {
+                stopLocation("location error");
+                return;
+            }
+            saveLocationCity(aMapLocation);
+            finishLocation();
+        }
+    };
 
     /**
      * 逆地理编码回调

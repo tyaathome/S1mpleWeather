@@ -14,6 +14,7 @@ public interface LoadingContract {
 
     interface Presenter extends BasePresenter {
         void beginLocation();
+        void requestCityData();
     }
 
 }
