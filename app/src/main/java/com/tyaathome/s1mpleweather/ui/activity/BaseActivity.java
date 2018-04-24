@@ -13,7 +13,7 @@ import com.tyaathome.s1mpleweather.utils.manager.InjectManager;
  * Created by tyaathome on 2018/2/24.
  */
 
-public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView {
+public abstract class BaseActivity<V extends BaseView, P extends BasePresenter<V>> extends AppCompatActivity implements BaseView {
 
     protected P mPresenter;
 
@@ -25,7 +25,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         InjectManager.inject(this);
         mPresenter = onLoadPresenter();
         if(getPresenter() != null) {
-            getPresenter().attachView(this);
+            getPresenter().attachView((V) this);
             initViews(savedInstanceState);
             initEventAndData();
             getPresenter().start();
