@@ -2,14 +2,12 @@ package com.tyaathome.s1mpleweather.ui.fragment;
 
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.TextView;
 
 import com.tyaathome.s1mpleweather.R;
 import com.tyaathome.s1mpleweather.model.annonations.inject.LayoutID;
 import com.tyaathome.s1mpleweather.mvp.base.BasePresenter;
 import com.tyaathome.s1mpleweather.mvp.contract.CityContract;
-import com.tyaathome.s1mpleweather.mvp.contract.MainContract;
 import com.tyaathome.s1mpleweather.mvp.presenter.CityPresenter;
 
 @LayoutID(R.layout.fragment_city)
@@ -26,11 +24,16 @@ public class CityFragment extends BaseFragment implements CityContract.View {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
-        textView = findViewById(R.id.textView2);
+        textView = findViewById(R.id.tv_city_name);
     }
 
     @Override
     public void initEventAndData() {
+
+    }
+
+    @Override
+    public void fillTextView() {
         Bundle bundle = getArguments();
         if(bundle != null) {
             String index = bundle.getString("index");
@@ -40,13 +43,5 @@ public class CityFragment extends BaseFragment implements CityContract.View {
                 textView.setText("");
             }
         }
-        textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MainContract.View vv = (MainContract.View) getContext();
-                vv.update();
-            }
-        });
     }
-
 }

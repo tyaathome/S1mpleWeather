@@ -4,10 +4,16 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
+import com.tyaathome.s1mpleweather.model.RealmObject.city.LocationCityRealmBean;
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.LoadingContract;
+import com.tyaathome.s1mpleweather.utils.manager.AutoDownloadManager;
+import com.tyaathome.s1mpleweather.utils.manager.ObservableManager;
+import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 import com.tyaathome.s1mpleweather.utils.tools.LocationTools;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
@@ -28,7 +34,6 @@ public class LoadingPresenter implements LoadingContract.Presenter {
 
     private LoadingContract.View mView;
     private Context mContext;
-    private ObservableEmitter<Integer> mEmitter;
     private static final int RETRY_COUNT = 3;
     private boolean isCompleteLocation = true;
     private int currentRetryTime = 0;
@@ -41,12 +46,12 @@ public class LoadingPresenter implements LoadingContract.Presenter {
     @Override
     public void beginLocation() {
         isCompleteLocation = false;
-        Observable.create(new ObservableOnSubscribe<Integer>() {
+        // 定位observable
+        Observable<Integer> locationObservable = Observable.create(new ObservableOnSubscribe<Integer>() {
             @Override
             public void subscribe(ObservableEmitter<Integer> emitter) throws Exception {
-                mEmitter = emitter;
                 if(!emitter.isDisposed() && !isCompleteLocation) {
-                    LocationTools.getInstance(mContext).startLocation(mEmitter);
+                    LocationTools.getInstance(mContext).startLocation(emitter);
                 }
             }
         }).retryWhen(new Function<Observable<Throwable>, ObservableSource<?>>() {
@@ -70,13 +75,38 @@ public class LoadingPresenter implements LoadingContract.Presenter {
                     }
                 });
             }
-        }).subscribe(Functions.emptyConsumer(), Functions.ON_ERROR_MISSING, new Action() {
+        });
+
+        // 首页数据请求observable
+        Observable dataObservable = Observable.create(new ObservableOnSubscribe() {
+            @Override
+            public void subscribe(final ObservableEmitter emitter) throws Exception {
+                LocationCityRealmBean city = CityTools.getInstance(mContext).getLocationCity();
+                if(city != null) {
+                    ObservableManager
+                            .getZipObservable(AutoDownloadManager.getMainData(city.getId()))
+                            .subscribe(Functions.emptyConsumer(), Functions.ON_ERROR_MISSING, new Action() {
+                                @Override
+                                public void run() throws Exception {
+                                    emitter.onComplete();
+                                }
+                            });
+                } else {
+                    emitter.onComplete();
+                }
+            }
+        });
+
+        List<Observable<?>> observableList = new ArrayList<>();
+        observableList.add(locationObservable);
+        observableList.add(dataObservable);
+
+        ObservableManager.concat(observableList, new Action() {
             @Override
             public void run() throws Exception {
                 mView.gotoNextActivity();
             }
         });
-
     }
 
     @Override

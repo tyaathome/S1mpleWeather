@@ -3,8 +3,10 @@ package com.tyaathome.s1mpleweather.net.factory;
 import android.text.TextUtils;
 
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackDown;
-import com.tyaathome.s1mpleweather.net.pack.week.WeekWeatherPackDown;
-import com.tyaathome.s1mpleweather.net.pack.week.WeekWeatherPackUp;
+import com.tyaathome.s1mpleweather.net.pack.main.sstq.SstqPackDown;
+import com.tyaathome.s1mpleweather.net.pack.main.sstq.SstqPackUp;
+import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackDown;
+import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackUp;
 
 
 /**
@@ -26,6 +28,9 @@ public class NetFactory {
         if (key.equals(WeekWeatherPackUp.NAME)) {
             // 一周天气
             return new WeekWeatherPackDown();
+        } else if (key.equals(SstqPackUp.NAME)) {
+            // 实时天气
+            return new SstqPackDown();
         }
 
         return null;

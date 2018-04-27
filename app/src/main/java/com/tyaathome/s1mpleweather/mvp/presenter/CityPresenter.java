@@ -21,6 +21,7 @@ public class CityPresenter implements CityContract.Presenter {
 
     @Override
     public void start() {
-
+        view.fillTextView();
     }
+
 }

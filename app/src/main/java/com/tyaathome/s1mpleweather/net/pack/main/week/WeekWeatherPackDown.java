@@ -1,4 +1,4 @@
-package com.tyaathome.s1mpleweather.net.pack.week;
+package com.tyaathome.s1mpleweather.net.pack.main.week;
 
 import android.text.TextUtils;
 

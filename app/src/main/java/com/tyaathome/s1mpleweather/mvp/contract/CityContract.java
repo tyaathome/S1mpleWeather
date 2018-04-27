@@ -6,7 +6,7 @@ import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 public interface CityContract {
 
     interface View extends BaseView {
-
+        void fillTextView();
     }
 
     interface Presenter extends BasePresenter {
