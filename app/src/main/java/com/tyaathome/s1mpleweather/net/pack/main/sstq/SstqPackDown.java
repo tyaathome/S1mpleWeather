@@ -2,8 +2,8 @@ package com.tyaathome.s1mpleweather.net.pack.main.sstq;
 
 import android.text.TextUtils;
 
-import com.tyaathome.s1mpleweather.model.RealmObject.main.sstq.SstqBean;
-import com.tyaathome.s1mpleweather.model.RealmObject.main.sstq.SstqInfoBean;
+import com.tyaathome.s1mpleweather.model.bean.main.sstq.SstqBean;
+import com.tyaathome.s1mpleweather.model.bean.main.sstq.SstqInfoBean;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackDown;
 
 import org.json.JSONObject;

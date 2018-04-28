@@ -12,10 +12,11 @@ import com.amap.api.services.core.AMapException;
 import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
+import com.amap.api.services.geocoder.RegeocodeAddress;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
-import com.tyaathome.s1mpleweather.model.RealmObject.city.CityRealmBean;
-import com.tyaathome.s1mpleweather.model.RealmObject.city.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.CityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
 
 import io.reactivex.ObservableEmitter;
 import io.realm.Realm;
@@ -38,6 +39,7 @@ public class LocationTools {
     // 定位回调
     private OnCompleteListener mOnCompleteListener;
     private ObservableEmitter emitter;
+    private static final boolean TEST = true;
 
     private LocationTools(Context context) {
         mContext = context;
@@ -125,14 +127,14 @@ public class LocationTools {
 
     /**
      * 保存定位城市
-     * @param aMapLocation 定位对象
+     * @param aMapBean 定位对象
      */
-    private void saveLocationCity(AMapLocation aMapLocation) {
+    private void saveLocationCity(AMapBean aMapBean) {
         // 格式化地址
-        String province = aMapLocation.getProvince();
-        String city = aMapLocation.getCity();
-        String county = aMapLocation.getDistrict();
-        String street = aMapLocation.getAddress();
+        String province = aMapBean.getProvince();
+        String city = aMapBean.getCity();
+        String county = aMapBean.getCounty();
+        String street = aMapBean.getStreet();
         if (!TextUtils.isEmpty(county) && street.contains(county)) {
             street = street.substring(street.indexOf(county)
                     + county.length());
@@ -148,8 +150,8 @@ public class LocationTools {
         locationCityRealmBean.setCity(bean.getCity());
         locationCityRealmBean.setCounty(bean.getCounty());
         locationCityRealmBean.setStreet(street);
-        locationCityRealmBean.setLatitude(aMapLocation.getLatitude());
-        locationCityRealmBean.setLongitude(aMapLocation.getLongitude());
+        locationCityRealmBean.setLatitude(aMapBean.getLatitude());
+        locationCityRealmBean.setLongitude(aMapBean.getLongitude());
         Realm.getDefaultInstance().beginTransaction();
         Realm.getDefaultInstance().copyToRealmOrUpdate(locationCityRealmBean);
         Realm.getDefaultInstance().commitTransaction();
@@ -162,8 +164,14 @@ public class LocationTools {
                 stopLocation("location error");
                 return;
             }
-            saveLocationCity(aMapLocation);
-            finishLocation();
+            if(TEST) {
+                //searchLocation(aMapLocation.getLatitude(), aMapLocation.getLongitude());
+                searchLocation(28.698846,115.868232);
+                //searchLocation(31.334647,120.741017);
+            } else {
+                saveLocationCity(new AMapBean(aMapLocation));
+                finishLocation();
+            }
         }
     };
 
@@ -179,8 +187,9 @@ public class LocationTools {
                     && regeocodeResult.getRegeocodeAddress().getFormatAddress() != null) {
                 // 保存城市
                 //saveLocationCity(regeocodeResult);
-                if(mOnCompleteListener != null) {
-                    mOnCompleteListener.OnComplete();
+                if(TEST) {
+                    saveLocationCity(new AMapBean(regeocodeResult));
+                    finishLocation();
                 }
             }
         }
@@ -196,6 +205,86 @@ public class LocationTools {
      */
     public interface OnCompleteListener {
         void OnComplete();
+    }
+
+    private static class AMapBean {
+        String province = "";
+        String city = "";
+        String county = "";
+        String street = "";
+        double latitude = 0.0d;
+        double longitude = 0.0d;
+
+        public AMapBean(AMapLocation aMapLocation) {
+            if(aMapLocation != null) {
+                province = aMapLocation.getProvince();
+                city = aMapLocation.getCity();
+                county = aMapLocation.getDistrict();
+                street = aMapLocation.getAddress();
+                latitude = aMapLocation.getLatitude();
+                longitude = aMapLocation.getLongitude();
+            }
+        }
+
+        public AMapBean(RegeocodeResult result) {
+            if(result != null) {
+                RegeocodeAddress address = result.getRegeocodeAddress();
+                RegeocodeQuery query = result.getRegeocodeQuery();
+                if(address != null) {
+                    province = address.getProvince();
+                    city = address.getCity();
+                    county = address.getDistrict();
+                    street = address.getFormatAddress();
+                }
+                if(query != null) {
+                    LatLonPoint latLng = query.getPoint();
+                    if(latLng != null) {
+                        latitude = latLng.getLatitude();
+                        longitude = latLng.getLongitude();
+                    }
+                }
+            }
+        }
+
+        /**
+         * 获取省份名
+         * @return
+         */
+        public String getProvince() {
+            return province;
+        }
+
+        /**
+         * 城市名
+         * @return
+         */
+        public String getCity() {
+            return city;
+        }
+
+        /**
+         * 获取县名
+         * @return
+         */
+        public String getCounty() {
+            return county;
+        }
+
+        /**
+         * 获取街道名
+         * @return
+         */
+        public String getStreet() {
+            return street;
+        }
+
+        public double getLatitude() {
+            return latitude;
+        }
+
+        public double getLongitude() {
+            return longitude;
+        }
     }
 
 }

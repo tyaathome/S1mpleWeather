@@ -25,7 +25,7 @@ public class CityFragmentAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         Fragment fragment = new CityFragment();
         Bundle bundle = new Bundle();
-        bundle.putString("index", dataList.get(position));
+        bundle.putString("key", dataList.get(position));
         fragment.setArguments(bundle);
         return fragment;
     }

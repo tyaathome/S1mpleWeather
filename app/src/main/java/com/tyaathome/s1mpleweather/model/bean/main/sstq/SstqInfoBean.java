@@ -1,4 +1,4 @@
-package com.tyaathome.s1mpleweather.model.RealmObject.main.sstq;
+package com.tyaathome.s1mpleweather.model.bean.main.sstq;
 
 import io.realm.RealmObject;
 

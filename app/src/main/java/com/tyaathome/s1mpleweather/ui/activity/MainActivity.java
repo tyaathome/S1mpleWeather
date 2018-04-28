@@ -7,10 +7,12 @@ import android.widget.TextView;
 
 import com.tyaathome.s1mpleweather.R;
 import com.tyaathome.s1mpleweather.model.annonations.inject.LayoutID;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
 import com.tyaathome.s1mpleweather.mvp.base.BasePresenter;
 import com.tyaathome.s1mpleweather.mvp.contract.MainContract;
 import com.tyaathome.s1mpleweather.mvp.presenter.MainPresenter;
 import com.tyaathome.s1mpleweather.ui.adapter.city.CityFragmentAdapter;
+import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,9 +41,12 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
     @Override
     public void initEventAndData() {
-        for(int i = 1; i <= count; i++) {
-            dataList.add(String.valueOf(i));
-        }
+//        for(int i = 1; i <= count; i++) {
+//            dataList.add(String.valueOf(i));
+//        }
+
+        LocationCityRealmBean location = CityTools.getInstance(this).getLocationCity();
+        dataList.add(location.getId());
         adapter = new CityFragmentAdapter(getSupportFragmentManager(), dataList);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

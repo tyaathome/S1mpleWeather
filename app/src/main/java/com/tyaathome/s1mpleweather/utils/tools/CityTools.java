@@ -3,9 +3,9 @@ package com.tyaathome.s1mpleweather.utils.tools;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.tyaathome.s1mpleweather.model.RealmObject.city.CityRealmBean;
-import com.tyaathome.s1mpleweather.model.RealmObject.city.CityList;
-import com.tyaathome.s1mpleweather.model.RealmObject.city.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.CityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.CityList;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
 
 import java.io.InputStream;
@@ -127,7 +127,7 @@ public class CityTools {
             return cityList.getCityList().where()
                     .equalTo("province", province)
                     .equalTo("city", city)
-                    .equalTo("county", county)
+                    .contains("county", county)
                     .findFirst();
         }
         return null;
@@ -138,7 +138,9 @@ public class CityTools {
      * @return 缓存定位城市
      */
     public LocationCityRealmBean getLocationCity() {
-        return Realm.getDefaultInstance().where(LocationCityRealmBean.class).findFirst();
+        return Realm.getDefaultInstance()
+                .where(LocationCityRealmBean.class)
+                .findFirst();
     }
 
 }

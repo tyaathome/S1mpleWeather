@@ -1,4 +1,4 @@
-package com.tyaathome.s1mpleweather.model.RealmObject.impl;
+package com.tyaathome.s1mpleweather.model.bean.impl;
 
 /**
  * 城市信息接口

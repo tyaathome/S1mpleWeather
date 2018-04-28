@@ -1,4 +1,4 @@
-package com.tyaathome.s1mpleweather.model.RealmObject.city;
+package com.tyaathome.s1mpleweather.model.bean.city;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
@@ -9,8 +9,11 @@ import io.realm.annotations.PrimaryKey;
 
 public class LocationCityRealmBean extends RealmObject {
 
+    private static final String NAME = "LocationCity";
+
     //主键
     @PrimaryKey
+    private String primaryKey = NAME;
     private long key;
     // 城市id
     private String id;

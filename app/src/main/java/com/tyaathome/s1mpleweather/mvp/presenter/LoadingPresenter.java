@@ -4,7 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
-import com.tyaathome.s1mpleweather.model.RealmObject.city.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.LoadingContract;
 import com.tyaathome.s1mpleweather.utils.manager.AutoDownloadManager;

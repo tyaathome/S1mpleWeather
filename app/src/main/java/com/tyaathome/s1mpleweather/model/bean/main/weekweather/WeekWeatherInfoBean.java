@@ -1,4 +1,4 @@
-package com.tyaathome.s1mpleweather.model.RealmObject.main.weekweather;
+package com.tyaathome.s1mpleweather.model.bean.main.weekweather;
 
 import io.realm.RealmObject;
 

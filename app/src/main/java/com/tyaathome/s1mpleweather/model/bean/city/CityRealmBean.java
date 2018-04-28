@@ -1,4 +1,4 @@
-package com.tyaathome.s1mpleweather.model.RealmObject.city;
+package com.tyaathome.s1mpleweather.model.bean.city;
 
 import io.realm.RealmObject;
 
