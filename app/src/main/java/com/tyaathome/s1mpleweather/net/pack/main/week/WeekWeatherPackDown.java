@@ -12,21 +12,23 @@ import io.realm.Realm;
 /**
  * 一周天气
  */
-public class WeekWeatherPackDown extends BasePackDown {
+public class WeekWeatherPackDown extends BasePackDown<WeekWeatherBean> {
 
-    public WeekWeatherBean data;
+    private WeekWeatherBean data;
 
     @Override
     public void fillData(Realm realm, final JSONObject json) {
-        realm.executeTransaction(new Realm.Transaction() {
-            @Override
-            public void execute(final Realm realm) {
-                realm.createOrUpdateObjectFromJson(WeekWeatherBean.class, json);
-                String key = json.optString("key");
-                if(!TextUtils.isEmpty(key)) {
-                    data = realm.where(WeekWeatherBean.class).equalTo("key", key).findFirst();
-                }
+        realm.executeTransaction(realm1 -> {
+            realm1.createOrUpdateObjectFromJson(WeekWeatherBean.class, json);
+            String key = json.optString("key");
+            if(!TextUtils.isEmpty(key)) {
+                data = realm1.where(WeekWeatherBean.class).equalTo("key", key).findFirst();
             }
         });
+    }
+
+    @Override
+    public WeekWeatherBean getData() {
+        return data;
     }
 }

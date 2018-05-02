@@ -23,14 +23,9 @@ public class AutoDownloadManager {
         List<BasePackUp> mainDataList = new ArrayList<>();
         if(!TextUtils.isEmpty(key)) {
             // 一周天气
-            WeekWeatherPackUp weekUp = new WeekWeatherPackUp();
-            weekUp.id = key;
-            mainDataList.add(weekUp);
-
+            mainDataList.add(new WeekWeatherPackUp(key));
             // 实时天气
-            SstqPackUp sstqUp = new SstqPackUp();
-            sstqUp.area = key;
-            mainDataList.add(sstqUp);
+            mainDataList.add(new SstqPackUp(key));
         }
         return mainDataList;
     }

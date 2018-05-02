@@ -1,17 +1,24 @@
 package com.tyaathome.s1mpleweather.net.pack.main.sstq;
 
+import com.tyaathome.s1mpleweather.model.bean.main.sstq.SstqBean;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.realm.Realm;
+
 /**
  * 实时天气
  */
-public class SstqPackUp extends BasePackUp {
+public class SstqPackUp extends BasePackUp<SstqBean> {
 
-    public String area = "";
+    private String area;
     public static final String NAME = "sstq";
+
+    public SstqPackUp(String area) {
+        this.area = area;
+    }
 
     @Override
     public JSONObject toJSON() {
@@ -27,5 +34,10 @@ public class SstqPackUp extends BasePackUp {
     @Override
     public String getName() {
         return NAME;
+    }
+
+    @Override
+    public SstqBean getCacheData() {
+        return Realm.getDefaultInstance().where(SstqBean.class).equalTo("key", area).findFirst();
     }
 }

@@ -15,8 +15,8 @@ import com.amap.api.services.geocoder.GeocodeSearch;
 import com.amap.api.services.geocoder.RegeocodeAddress;
 import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
-import com.tyaathome.s1mpleweather.model.bean.city.CityRealmBean;
-import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 
 import io.reactivex.ObservableEmitter;
 import io.realm.Realm;
@@ -142,18 +142,18 @@ public class LocationTools {
             street = street.substring(street.indexOf(city)
                     + county.length());
         }
-        CityRealmBean bean = CityTools.getInstance(mContext).getCity(province, city, county);
-        LocationCityRealmBean locationCityRealmBean = new LocationCityRealmBean();
-        locationCityRealmBean.setId(bean.getId());
-        locationCityRealmBean.setParent_id(bean.getParent_id());
-        locationCityRealmBean.setProvince(bean.getProvince());
-        locationCityRealmBean.setCity(bean.getCity());
-        locationCityRealmBean.setCounty(bean.getCounty());
-        locationCityRealmBean.setStreet(street);
-        locationCityRealmBean.setLatitude(aMapBean.getLatitude());
-        locationCityRealmBean.setLongitude(aMapBean.getLongitude());
+        CityBean bean = CityTools.getInstance(mContext).getCity(province, city, county);
+        LocationCityBean locationCityBean = new LocationCityBean();
+        locationCityBean.setId(bean.getId());
+        locationCityBean.setParent_id(bean.getParent_id());
+        locationCityBean.setProvince(bean.getProvince());
+        locationCityBean.setCity(bean.getCity());
+        locationCityBean.setCounty(bean.getCounty());
+        locationCityBean.setStreet(street);
+        locationCityBean.setLatitude(aMapBean.getLatitude());
+        locationCityBean.setLongitude(aMapBean.getLongitude());
         Realm.getDefaultInstance().beginTransaction();
-        Realm.getDefaultInstance().copyToRealmOrUpdate(locationCityRealmBean);
+        Realm.getDefaultInstance().copyToRealmOrUpdate(locationCityBean);
         Realm.getDefaultInstance().commitTransaction();
     }
 

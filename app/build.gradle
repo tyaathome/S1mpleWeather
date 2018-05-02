@@ -15,10 +15,9 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         ndk {
-            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86","arm64-v8a","x86_64"
+            abiFilters "armeabi", "armeabi-v7a", "arm64-v8a", "x86", "arm64-v8a", "x86_64"
         }
     }
-
     signingConfigs {
         debug {
             keyAlias props['KEY_ALIAS']
@@ -33,7 +32,6 @@ android {
             storePassword props['KEYSTORE_PASSWORD']
         }
     }
-
     buildTypes {
         release {
             signingConfig signingConfigs.release
@@ -44,16 +42,20 @@ android {
     lintOptions {
         abortOnError false
     }
-
 //    sourceSets {
 //        main {
 //            jniLibs.srcDirs = ['libs']
 //        }
 //    }
+    buildToolsVersion '27.0.3'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'

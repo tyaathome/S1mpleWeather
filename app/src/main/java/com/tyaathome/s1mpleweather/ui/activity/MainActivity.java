@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.tyaathome.s1mpleweather.R;
 import com.tyaathome.s1mpleweather.model.annonations.inject.LayoutID;
-import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 import com.tyaathome.s1mpleweather.mvp.base.BasePresenter;
 import com.tyaathome.s1mpleweather.mvp.contract.MainContract;
 import com.tyaathome.s1mpleweather.mvp.presenter.MainPresenter;
@@ -15,6 +15,7 @@ import com.tyaathome.s1mpleweather.ui.adapter.city.CityFragmentAdapter;
 import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @LayoutID(R.layout.activity_main)
@@ -26,6 +27,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private TextView tvCityName;
     private int count = 5;
     private List<String> dataList = new ArrayList<>();
+    private String[] cityList = {"1278", "1233", "10955", "1069", "1099"};
 
     @Override
     protected BasePresenter onLoadPresenter() {
@@ -45,25 +47,11 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 //            dataList.add(String.valueOf(i));
 //        }
 
-        LocationCityRealmBean location = CityTools.getInstance(this).getLocationCity();
+        LocationCityBean location = CityTools.getInstance(this).getLocationCity();
         dataList.add(location.getId());
         adapter = new CityFragmentAdapter(getSupportFragmentManager(), dataList);
         viewPager.setAdapter(adapter);
-        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
+        viewPager.addOnPageChangeListener(onPageChangeListener);
         tvCityName.setOnClickListener(onClickListener);
     }
 
@@ -74,12 +62,28 @@ public class MainActivity extends BaseActivity implements MainContract.View {
                 case R.id.tv_city_name:
                     count++;
                     dataList.clear();
-                    for(int i = 1; i <= count; i++) {
-                        dataList.add(String.valueOf(i));
-                    }
+                    LocationCityBean location = CityTools.getInstance(MainActivity.this).getLocationCity();
+                    dataList.add(location.getId());
+                    dataList.addAll(Arrays.asList(cityList));
                     adapter.notifyDataSetChanged();
                     break;
             }
+        }
+    };
+
+    private ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
         }
     };
 }

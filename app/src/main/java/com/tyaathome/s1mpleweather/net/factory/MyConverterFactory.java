@@ -1,7 +1,6 @@
 package com.tyaathome.s1mpleweather.net.factory;
 
 
-import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -86,24 +85,21 @@ public class MyConverterFactory extends Converter.Factory{
     // 响应
     @Override
     public Converter<ResponseBody, ?> responseBodyConverter(final Type type, Annotation[] annotations, Retrofit retrofit) {
-        return new Converter<ResponseBody, BasePackDown>() {
-            @Override
-            public BasePackDown convert(@NonNull ResponseBody value) throws IOException {
-                String json = value.string();
-                String bodyName = getBodyName(json);
-                String bodyJson = getBodyJSON(json, bodyName);
-                BasePackDown response = NetFactory.getResponse(bodyName);
-                if (response == null) {
-                    return null;
-                }
-                try {
-                    response.fillData(Realm.getDefaultInstance(), new JSONObject(bodyJson));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                Log.e("Json", "down: " + json);
-                return response;
+        return (Converter<ResponseBody, BasePackDown>) value -> {
+            String json = value.string();
+            String bodyName = getBodyName(json);
+            String bodyJson = getBodyJSON(json, bodyName);
+            BasePackDown response = NetFactory.getResponse(bodyName);
+            if (response == null) {
+                return null;
             }
+            try {
+                response.fillData(Realm.getDefaultInstance(), new JSONObject(bodyJson));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Log.e("Json", "down: " + json);
+            return response;
         };
     }
 

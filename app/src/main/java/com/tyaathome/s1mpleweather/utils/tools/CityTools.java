@@ -3,9 +3,9 @@ package com.tyaathome.s1mpleweather.utils.tools;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
-import com.tyaathome.s1mpleweather.model.bean.city.CityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
 import com.tyaathome.s1mpleweather.model.bean.city.CityList;
-import com.tyaathome.s1mpleweather.model.bean.city.LocationCityRealmBean;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
 
 import java.io.InputStream;
@@ -71,12 +71,12 @@ public class CityTools {
             }
             if (inputStreamReader != null) {
                 Scanner scanner = new Scanner(inputStreamReader);
-                RealmList<CityRealmBean> realmList = new RealmList<>();
+                RealmList<CityBean> realmList = new RealmList<>();
                 while (scanner.hasNext()) {
                     String[] line = parseLine(scanner.nextLine());
                     if (line.length == 7) {
                         // 添加城市列表至realm
-                        CityRealmBean bean = new CityRealmBean();
+                        CityBean bean = new CityBean();
                         bean.setId(line[0]);
                         bean.setParent_id(line[1]);
                         bean.setProvince(line[2]);
@@ -115,7 +115,7 @@ public class CityTools {
      * @param county   县
      * @return 返回城市信息
      */
-    public CityRealmBean getCity(String province, String city, String county) {
+    public CityBean getCity(String province, String city, String county) {
 //        if (province.endsWith("省") || province.endsWith("市")) {
 //            province = province.substring(0, province.length() - 1);
 //        }
@@ -137,9 +137,9 @@ public class CityTools {
      * 获取本地定位城市
      * @return 缓存定位城市
      */
-    public LocationCityRealmBean getLocationCity() {
+    public LocationCityBean getLocationCity() {
         return Realm.getDefaultInstance()
-                .where(LocationCityRealmBean.class)
+                .where(LocationCityBean.class)
                 .findFirst();
     }
 

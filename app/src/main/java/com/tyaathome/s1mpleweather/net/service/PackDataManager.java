@@ -177,7 +177,7 @@ public class PackDataManager {
 //            if (BasePackDown == null) {
 //                return null;
 //            }
-//            BasePackDown.fillData(json);
+//            BasePackDown.fillSstqData(json);
 //            return BasePackDown;
 //        }
 //        return null;
@@ -190,7 +190,7 @@ public class PackDataManager {
 //            if (pack == null) {
 //                return null;
 //            }
-//            pack.fillData(json);
+//            pack.fillSstqData(json);
 //            return pack;
 //        }
 //        return null;

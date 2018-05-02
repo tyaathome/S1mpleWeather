@@ -12,7 +12,7 @@ public class CityList extends RealmObject {
 
     @PrimaryKey
     private long key;
-    private RealmList<CityRealmBean> cityList;
+    private RealmList<CityBean> cityList;
 
     public long getKey() {
         return key;
@@ -22,11 +22,11 @@ public class CityList extends RealmObject {
         this.key = key;
     }
 
-    public RealmList<CityRealmBean> getCityList() {
+    public RealmList<CityBean> getCityList() {
         return cityList;
     }
 
-    public void setCityList(RealmList<CityRealmBean> cityList) {
+    public void setCityList(RealmList<CityBean> cityList) {
         this.cityList = cityList;
     }
 }

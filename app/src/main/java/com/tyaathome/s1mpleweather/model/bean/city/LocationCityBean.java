@@ -7,7 +7,7 @@ import io.realm.annotations.PrimaryKey;
  * Created by tyaathome on 2018/2/28.
  */
 
-public class LocationCityRealmBean extends RealmObject {
+public class LocationCityBean extends RealmObject {
 
     private static final String NAME = "LocationCity";
 

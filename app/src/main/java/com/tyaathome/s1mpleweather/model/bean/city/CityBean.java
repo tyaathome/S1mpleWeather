@@ -6,7 +6,7 @@ import io.realm.RealmObject;
  * Created by tyaathome on 2018/2/28.
  */
 
-public class CityRealmBean extends RealmObject {
+public class CityBean extends RealmObject {
     // 城市id
     private String id = "";
     // 父id
