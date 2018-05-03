@@ -6,12 +6,18 @@ import com.tyaathome.s1mpleweather.net.pack.base.BasePackDown;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -21,11 +27,6 @@ import okhttp3.RequestBody;
  */
 
 public class PackDataManager {
-
-    /**
-     * json包开头的p
-     */
-    private static String mP = "";
 
     /**
      * 数据类型
@@ -76,7 +77,7 @@ public class PackDataManager {
                 .subscribe(new Observer<BasePackDown>() {
                     @Override
                     public void onSubscribe(@NonNull Disposable d) {
-                        if(onComplete != null) {
+                        if (onComplete != null) {
                             onComplete.onSubscribe(d);
                         }
                     }
@@ -142,71 +143,53 @@ public class PackDataManager {
                 });
     }
 
-//    public static void saveLocalPack(String key, BaseLocalPack pack) {
-//        SQLiteDatabase db = null;
-//        Context context = PcsInit.getInstance().getContext();
-//        try {
-//            db = DBHelper.getInstance(context).getReadableDatabase();
-//            SqliteUtil.getInstance().setInfo(db, key, pack.toJsonStr());
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (db != null && db.isOpen()) {
-//                //db.close();
-//            }
-//        }
-//    }
-//
-//    /**
-//     * 删除本地数据
-//     *
-//     * @param key
-//     */
-//    public static void removeLocalData(String key) {
-//        SqliteUtil.getInstance().deleteData(key);
-//        //SqliteUtil.getInstance().closeDB();
-//    }
-//
-//    public static BasePackDown getNetPack(String key) {
-//        if (TextUtils.isEmpty(key)) {
-//            return null;
-//        }
-//        String json = SqliteUtil.getInstance().getInfo(key);
-//        if (!TextUtils.isEmpty(json)) {
-//            BasePackDown BasePackDown = NetFactory.getResponse(key);
-//            if (BasePackDown == null) {
-//                return null;
-//            }
-//            BasePackDown.fillSstqData(json);
-//            return BasePackDown;
-//        }
-//        return null;
-//    }
-//
-//    public static BaseLocalPack getLocalPack(String key) {
-//        String json = SqliteUtil.getInstance().getInfo(key);
-//        if (!TextUtils.isEmpty(json)) {
-//            BaseLocalPack pack = NetFactory.getLocalPack(key);
-//            if (pack == null) {
-//                return null;
-//            }
-//            pack.fillSstqData(json);
-//            return pack;
-//        }
-//        return null;
-//    }
-
     /**
-     * 设置head里的p
+     * 异步合并请求数据
      *
-     * @param p
+     * @param sources  上传包列表
+     * @param observer 下载回调
      */
-    public static void setP(String p) {
-        mP = p;
+    public static void mergeRequest(Iterable<? extends BasePackUp> sources, Observer<RealmObject> observer) {
+        List<Observable<RealmObject>> observableList = new ArrayList<>();
+        for (BasePackUp up : sources) {
+            Observable<RealmObject> observable = AppService.getInstance().getApi().getData(up)
+                    //.observeOn(AndroidSchedulers.mainThread())
+                    .flatMap((Function
+                    <BasePackDown, ObservableSource<RealmObject>>) basePackDown -> Observable.create(emitter -> {
+                        String threadName = Thread.currentThread().getName();
+                RealmObject object = basePackDown.getData();
+                emitter.onNext(object);
+                emitter.onComplete();
+            }));
+            observableList.add(observable);
+        }
+        Observable.merge(observableList)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
     }
 
-    public static String getP() {
-        return mP;
+    /**
+     * 异步合并获取缓存数据
+     *
+     * @param sources  上传包列表
+     * @param observer 获取缓存完成回调
+     */
+    public static void mergeCache(Iterable<? extends BasePackUp> sources, Observer<RealmObject> observer) {
+        List<Observable<RealmObject>> observables = new ArrayList<>();
+        for (BasePackUp up : sources) {
+            Observable<RealmObject> observable = Observable.create(emitter -> {
+                RealmObject object = up.getCacheData();
+                emitter.onNext(object);
+                emitter.onComplete();
+            });
+            observables.add(observable);
+        }
+        Observable.merge(observables)
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(observer);
+
     }
 
 }
