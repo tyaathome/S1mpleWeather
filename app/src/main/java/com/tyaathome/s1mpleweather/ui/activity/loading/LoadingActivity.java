@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.widget.Toast;
 
 import com.tyaathome.s1mpleweather.R;
 import com.tyaathome.s1mpleweather.model.annonations.inject.LayoutID;
@@ -85,6 +84,5 @@ public class LoadingActivity extends BaseActivity implements LoadingContract.Vie
     private void initCityList() {
         long start = System.currentTimeMillis();
         CityTools.getInstance(this);
-        Toast.makeText(this, String.valueOf(System.currentTimeMillis() - start), Toast.LENGTH_LONG).show();
     }
 }

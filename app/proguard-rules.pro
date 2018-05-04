@@ -313,7 +313,7 @@ public void xxxxxx(**);
 -keep class com.google.**{*;}
 -keep class sun.misc.Unsafe { *; }
 -keep class com.google.gson.stream.** { *; }
--keep class com.google.gson.examples.android.model.** { *; }
+-keep class com.tyaathome.s1mpleweather.model.** { *; }
 
 -keepclassmembers class * implements java.io.Serializable {
     static final long serialVersionUID;
@@ -324,7 +324,6 @@ public void xxxxxx(**);
     java.lang.Object readResolve();
 }
 -keep public class * implements java.io.Serializable {*;}
-
 
 # support-v4
 #https://stackoverflow.com/questions/18978706/obfuscate-android-support-v7-widget-gridlayout-issue

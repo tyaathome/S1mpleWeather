@@ -11,18 +11,10 @@ import io.realm.Realm;
  */
 
 public class App extends MultiDexApplication {
-
-    public static Realm realm;
-
     @Override
     public void onCreate() {
         super.onCreate();
         Realm.init(this);
-        realm = Realm.getDefaultInstance();
-    }
-
-    public static Realm getRealmInstance() {
-        return realm;
     }
 
     @Override

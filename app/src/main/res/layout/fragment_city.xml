@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                              xmlns:app="http://schemas.android.com/apk/res-auto"
-                                             xmlns:tools="http://schemas.android.com/tools"
                                              android:layout_width="match_parent"
-                                             android:layout_height="match_parent">
+                android:layout_height="match_parent"
+    >
 
     <in.srain.cube.views.ptr.PtrClassicFrameLayout
         android:id="@+id/refresh"
         xmlns:cube_ptr="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        cube_ptr:layout_constraintBottom_toBottomOf="parent"
+        cube_ptr:layout_constraintEnd_toEndOf="parent"
+        cube_ptr:layout_constraintStart_toStartOf="parent"
+        cube_ptr:layout_constraintTop_toTopOf="parent"
         cube_ptr:ptr_duration_to_close="300"
         cube_ptr:ptr_duration_to_close_header="1000"
         cube_ptr:ptr_keep_header_when_refresh="true"
@@ -20,10 +24,9 @@
         <ScrollView
             android:id="@+id/scrollview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:scrollbars="none"
-            >
+            android:scrollbars="none">
 
             <LinearLayout
                 android:id="@+id/layout_root"
@@ -35,5 +38,4 @@
 
         </ScrollView>
     </in.srain.cube.views.ptr.PtrClassicFrameLayout>
-
 </android.support.constraint.ConstraintLayout>

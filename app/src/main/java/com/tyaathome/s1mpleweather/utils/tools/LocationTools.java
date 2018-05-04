@@ -39,7 +39,7 @@ public class LocationTools {
     // 定位回调
     private OnCompleteListener mOnCompleteListener;
     private ObservableEmitter emitter;
-    private static final boolean TEST = true;
+    private static final boolean TEST = false;
 
     private LocationTools(Context context) {
         mContext = context;

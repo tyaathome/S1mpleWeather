@@ -49,6 +49,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
         LocationCityBean location = CityTools.getInstance(this).getLocationCity();
         dataList.add(location.getId());
+        dataList.addAll(Arrays.asList(cityList));
         adapter = new CityFragmentAdapter(getSupportFragmentManager(), dataList);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(onPageChangeListener);

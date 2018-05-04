@@ -1,6 +1,7 @@
 package com.tyaathome.s1mpleweather.ui.viewcontroller;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -34,7 +35,8 @@ public class MainViewController extends ViewController<MainEntity> {
         if(sstqBean != null) {
             SstqInfoBean sstqInfoBean = sstqBean.getSstq();
             if(sstqInfoBean != null) {
-                tvCurrentTemp.setText(sstqInfoBean.getCt());
+                tvCurrentTemp.setText(sstqInfoBean.getCt() + "  " + sstqInfoBean.getCityName());
+                Log.e("time____", String.valueOf(System.currentTimeMillis()));
             }
         }
     }

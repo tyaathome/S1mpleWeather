@@ -156,7 +156,6 @@ public class PackDataManager {
                     //.observeOn(AndroidSchedulers.mainThread())
                     .flatMap((Function
                     <BasePackDown, ObservableSource<RealmObject>>) basePackDown -> Observable.create(emitter -> {
-                        String threadName = Thread.currentThread().getName();
                 RealmObject object = basePackDown.getData();
                 emitter.onNext(object);
                 emitter.onComplete();
@@ -186,8 +185,8 @@ public class PackDataManager {
             observables.add(observable);
         }
         Observable.merge(observables)
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(observer);
 
     }

@@ -14,6 +14,7 @@ import com.tyaathome.s1mpleweather.net.pack.main.sstq.SstqPackUp;
 import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackUp;
 import com.tyaathome.s1mpleweather.net.service.PackDataManager;
 import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.EntityImpl;
+import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.ForecastEntity;
 import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.MainEntity;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class CityPresenter implements CityContract.Presenter {
         packList.add(weekWeatherPackUp);
 
         // 合并请求缓存数据
-        //PackDataManager.mergeCache(packList, requestObserver);
+        PackDataManager.mergeCache(packList, requestObserver);
         // 合并请求网络数据
         PackDataManager.mergeRequest(packList, requestObserver);
     }
@@ -77,7 +78,6 @@ public class CityPresenter implements CityContract.Presenter {
 
         @Override
         public void onNext(RealmObject realmObject) {
-            String threadName = Thread.currentThread().getName();
             if(realmObject instanceof SstqBean) {
                 sstqBean = (SstqBean) realmObject;
             } else if (realmObject instanceof WeekWeatherBean) {
@@ -92,11 +92,14 @@ public class CityPresenter implements CityContract.Presenter {
 
         @Override
         public void onComplete() {
-            String threadName = Thread.currentThread().getName();
             // 首页组件数据填充
             List<EntityImpl> entityList = new ArrayList<>();
+            // 第一屏数据
             MainEntity mainEntity = new MainEntity(sstqBean, weekWeatherBean);
             entityList.add(mainEntity);
+            // 预报数据
+            ForecastEntity forecastEntity = new ForecastEntity(weekWeatherBean);
+            entityList.add(forecastEntity);
             view.fillData(entityList);
         }
     };

@@ -30,6 +30,7 @@ public class MyConverterFactory extends Converter.Factory{
 
     private static final MediaType MEDIA_TYPE = MediaType.parse("text/plain");
     static final MediaType STREAM_TYPE = MediaType.parse("application/octet-stream");
+    private static final String TAG = "APP_JSON_DATA";
     public MyConverterFactory() {
 
     }
@@ -98,7 +99,7 @@ public class MyConverterFactory extends Converter.Factory{
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-            Log.e("Json", "down: " + json);
+            Log.e(TAG, "down: " + json);
             return response;
         };
     }
@@ -127,7 +128,7 @@ public class MyConverterFactory extends Converter.Factory{
                     // 添加body
                     body.put(value.getName(), value.toJSON());
                     object.put("b", body);
-                    Log.e("Json", "up: " + object.toString());
+                    Log.e(TAG, "up: " + object.toString());
                     return RequestBody.create(MEDIA_TYPE, object.toString());
 
                 } catch (JSONException e) {

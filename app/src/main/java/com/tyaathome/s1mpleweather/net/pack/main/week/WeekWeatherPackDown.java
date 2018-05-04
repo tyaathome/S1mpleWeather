@@ -1,7 +1,7 @@
 package com.tyaathome.s1mpleweather.net.pack.main.week;
 
-import android.text.TextUtils;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.tyaathome.s1mpleweather.model.bean.main.weekweather.WeekWeatherBean;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackDown;
 
@@ -18,13 +18,9 @@ public class WeekWeatherPackDown extends BasePackDown<WeekWeatherBean> {
 
     @Override
     public void fillData(Realm realm, final JSONObject json) {
-        realm.executeTransaction(realm1 -> {
-            realm1.createOrUpdateObjectFromJson(WeekWeatherBean.class, json);
-            String key = json.optString("key");
-            if(!TextUtils.isEmpty(key)) {
-                data = realm1.where(WeekWeatherBean.class).equalTo("key", key).findFirst();
-            }
-        });
+        Gson gson = new GsonBuilder().create();
+        data = gson.fromJson(json.toString(), WeekWeatherBean.class);
+        realm.executeTransaction(realm1 -> realm1.copyToRealmOrUpdate(data));
     }
 
     @Override

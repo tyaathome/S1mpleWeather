@@ -1,6 +1,7 @@
 package com.tyaathome.s1mpleweather.utils;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -80,6 +81,20 @@ public class CommonUtils {
         int[] location = getViewLocation(view);
         if(location.length == 2) {
             return location[1];
+        }
+        return 0;
+    }
+
+    /**
+     * 获取底部按键高度
+     * @param context
+     * @return
+     */
+    public static int getBottomButtonHeight(Context context) {
+        Resources resources = context.getResources();
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
         }
         return 0;
     }
