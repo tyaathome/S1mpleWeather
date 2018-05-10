@@ -1,5 +1,6 @@
 package com.tyaathome.s1mpleweather.mvp.presenter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,6 +10,7 @@ import com.tyaathome.s1mpleweather.model.bean.main.sstq.SstqBean;
 import com.tyaathome.s1mpleweather.model.bean.main.weekweather.WeekWeatherBean;
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.CityContract;
+import com.tyaathome.s1mpleweather.net.listener.MyObserver;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
 import com.tyaathome.s1mpleweather.net.pack.main.sstq.SstqPackUp;
 import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackUp;
@@ -20,8 +22,6 @@ import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.MainEntity;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 import io.realm.RealmObject;
 
 public class CityPresenter implements CityContract.Presenter {
@@ -53,6 +53,7 @@ public class CityPresenter implements CityContract.Presenter {
         }
     }
 
+    @SuppressLint("CheckResult")
     @Override
     public void getData(String key) {
         if(TextUtils.isEmpty(key)) {
@@ -65,23 +66,24 @@ public class CityPresenter implements CityContract.Presenter {
         packList.add(weekWeatherPackUp);
 
         // 合并请求缓存数据
-        PackDataManager.mergeCache(packList, requestObserver);
+        //PackDataManager.mergeCache(packList, requestObserver);
+        PackDataManager.zipCache(packList, myObserver);
         // 合并请求网络数据
-        PackDataManager.mergeRequest(packList, requestObserver);
+        //PackDataManager.mergeRequest(packList, requestObserver);
+        PackDataManager.zipRequest(packList, myObserver2);
+
+
     }
 
-    private Observer<RealmObject> requestObserver = new Observer<RealmObject>() {
+    private MyObserver<RealmObject[]> myObserver = new MyObserver<RealmObject[]>() {
         @Override
-        public void onSubscribe(Disposable d) {
-
-        }
-
-        @Override
-        public void onNext(RealmObject realmObject) {
-            if(realmObject instanceof SstqBean) {
-                sstqBean = (SstqBean) realmObject;
-            } else if (realmObject instanceof WeekWeatherBean) {
-                weekWeatherBean = (WeekWeatherBean) realmObject;
+        public void onNext(RealmObject[] realmObject) {
+            for(RealmObject bean : realmObject) {
+                if (bean instanceof SstqBean) {
+                    sstqBean = (SstqBean) bean;
+                } else if (bean instanceof WeekWeatherBean) {
+                    weekWeatherBean = (WeekWeatherBean) bean;
+                }
             }
         }
 
@@ -100,7 +102,39 @@ public class CityPresenter implements CityContract.Presenter {
             // 预报数据
             ForecastEntity forecastEntity = new ForecastEntity(weekWeatherBean);
             entityList.add(forecastEntity);
-            view.fillData(entityList);
+            view.fillData(entityList, "cache");
+        }
+    };
+
+    private MyObserver<RealmObject[]> myObserver2 = new MyObserver<RealmObject[]>() {
+        @Override
+        public void onNext(RealmObject[] realmObject) {
+            for(RealmObject bean : realmObject) {
+                if (bean instanceof SstqBean) {
+                    sstqBean = (SstqBean) bean;
+                } else if (bean instanceof WeekWeatherBean) {
+                    weekWeatherBean = (WeekWeatherBean) bean;
+
+                }
+            }
+        }
+
+        @Override
+        public void onError(Throwable e) {
+
+        }
+
+        @Override
+        public void onComplete() {
+            // 首页组件数据填充
+            List<EntityImpl> entityList = new ArrayList<>();
+            // 第一屏数据
+            MainEntity mainEntity = new MainEntity(sstqBean, weekWeatherBean);
+            entityList.add(mainEntity);
+//            // 预报数据
+            ForecastEntity forecastEntity = new ForecastEntity(weekWeatherBean);
+            entityList.add(forecastEntity);
+            view.fillData(entityList, "net");
         }
     };
 

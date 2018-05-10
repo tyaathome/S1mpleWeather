@@ -41,4 +41,9 @@ public class MainViewController extends ViewController<MainEntity> {
         }
     }
 
+    public void setText(String testMessage) {
+        String str = tvCurrentTemp.getText().toString() + "   " + testMessage;
+        tvCurrentTemp.setText(str);
+    }
+
 }

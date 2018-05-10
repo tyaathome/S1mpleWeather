@@ -40,4 +40,5 @@ public class SstqPackUp extends BasePackUp<SstqBean> {
     public SstqBean getCacheData() {
         return Realm.getDefaultInstance().where(SstqBean.class).equalTo("key", area).findFirst();
     }
+
 }

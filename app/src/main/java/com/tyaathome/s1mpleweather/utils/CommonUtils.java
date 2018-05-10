@@ -5,8 +5,12 @@ import android.content.res.Resources;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 
 /**
  * 公共工具类
@@ -97,6 +101,43 @@ public class CommonUtils {
             return resources.getDimensionPixelSize(resourceId);
         }
         return 0;
+    }
+
+    public static Object deepCopy(Object o) {
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
+        try
+        {
+            ByteArrayOutputStream bos =
+                    new ByteArrayOutputStream();
+            oos = new ObjectOutputStream(bos);
+            // serialize and pass the object
+            oos.writeObject(o);
+            oos.flush();
+            ByteArrayInputStream bin =
+                    new ByteArrayInputStream(bos.toByteArray());
+            ois = new ObjectInputStream(bin);
+            // return the new object
+            return ois.readObject();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Exception in ObjectCloner = " + e);
+        }
+        finally
+        {
+            try {
+                if(oos != null) {
+                    oos.close();
+                }
+                if(ois != null) {
+                    ois.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
     }
 
 }

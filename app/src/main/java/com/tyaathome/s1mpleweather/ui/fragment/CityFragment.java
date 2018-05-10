@@ -89,15 +89,17 @@ public class CityFragment extends BaseFragment implements CityContract.View {
     }
 
     @Override
-    public void fillData(List<EntityImpl> entityList) {
+    public void fillData(List<EntityImpl> entityList, String testMessage) {
         for(EntityImpl entity : entityList) {
             if(entity instanceof MainEntity) {
                 MainEntity mainEntity = (MainEntity) entity;
                 mainViewController.fillData(mainEntity);
+                mainViewController.setText(testMessage);
             } else if (entity instanceof ForecastEntity) {
                 ForecastEntity forecastEntity = (ForecastEntity) entity;
                 forecastViewController.fillData(forecastEntity);
             }
         }
     }
+
 }

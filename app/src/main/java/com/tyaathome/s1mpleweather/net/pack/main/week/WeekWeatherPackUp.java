@@ -41,4 +41,5 @@ public class WeekWeatherPackUp extends BasePackUp<WeekWeatherBean> {
     public WeekWeatherBean getCacheData() {
         return Realm.getDefaultInstance().where(WeekWeatherBean.class).equalTo("key", id).findFirst();
     }
+
 }

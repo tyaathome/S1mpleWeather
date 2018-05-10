@@ -9,7 +9,7 @@ import java.util.List;
 public interface CityContract {
 
     interface View extends BaseView {
-        void fillData(List<EntityImpl> entityList);
+        void fillData(List<EntityImpl> entityList, String testMessage);
     }
 
     interface Presenter extends BasePresenter {
