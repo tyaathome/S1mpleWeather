@@ -12,12 +12,11 @@ import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.CityContract;
 import com.tyaathome.s1mpleweather.net.listener.MyObserver;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
-import com.tyaathome.s1mpleweather.net.pack.main.sstq.SstqPackUp;
-import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackUp;
 import com.tyaathome.s1mpleweather.net.service.PackDataManager;
 import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.EntityImpl;
 import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.ForecastEntity;
 import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.MainEntity;
+import com.tyaathome.s1mpleweather.utils.manager.AutoDownloadManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,11 +58,13 @@ public class CityPresenter implements CityContract.Presenter {
         if(TextUtils.isEmpty(key)) {
            return;
         }
-        SstqPackUp sstqPackUp = new SstqPackUp(key);
-        WeekWeatherPackUp weekWeatherPackUp = new WeekWeatherPackUp(key);
-        List<BasePackUp> packList = new ArrayList<>();
-        packList.add(sstqPackUp);
-        packList.add(weekWeatherPackUp);
+//        SstqPackUp sstqPackUp = new SstqPackUp(key);
+//        WeekWeatherPackUp weekWeatherPackUp = new WeekWeatherPackUp(key);
+//        List<BasePackUp> packList = new ArrayList<>();
+//        packList.add(sstqPackUp);
+//        packList.add(weekWeatherPackUp);
+
+        List<BasePackUp> packList = AutoDownloadManager.getMainData(key);
 
         // 合并请求缓存数据
         //PackDataManager.mergeCache(packList, requestObserver);

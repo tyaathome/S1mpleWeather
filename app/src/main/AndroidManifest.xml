@@ -46,6 +46,8 @@
             android:enabled="true"
             android:exported="false">
         </provider>
+
+        <service android:name="com.amap.api.location.APSService"/>
     </application>
 
 </manifest>

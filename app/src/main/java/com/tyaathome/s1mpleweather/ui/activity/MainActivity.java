@@ -27,7 +27,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private TextView tvCityName;
     private int count = 5;
     private List<String> dataList = new ArrayList<>();
-    private String[] cityList = {"1278", "1233", "10955", "1069", "1099"};
+    private String[] cityList = {"1278", "1233", "10955", "1069", "1099", "30828", "1163", "1234", "1214"};
 
     @Override
     protected BasePresenter onLoadPresenter() {
@@ -53,7 +53,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         adapter = new CityFragmentAdapter(getSupportFragmentManager(), dataList);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(onPageChangeListener);
-        viewPager.setOffscreenPageLimit(9);
+        //viewPager.setOffscreenPageLimit(9);
         tvCityName.setOnClickListener(onClickListener);
     }
 

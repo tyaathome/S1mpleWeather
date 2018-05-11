@@ -16,11 +16,11 @@ import retrofit2.http.Part;
  */
 public interface AppAPI {
     @Multipart
-    @POST("ztq30_fj_jc/service.do")
+    @POST("ztq_sh_jc/service.do")
     Observable<BasePackDown> getData(@Part("p") BasePackUp request);
 
     @Multipart
-    @POST("ztq30_fj_jc/service.do")
+    @POST("ztq_sh_jc/service.do")
     Observable<BasePackDown> getData(@Part("file\"; filename=\"pp.png\" ") BasePackUp filerequest, @Part("p")
             BasePackUp request);
 
@@ -31,6 +31,6 @@ public interface AppAPI {
      * @return 响应包回调
      */
     @Multipart
-    @POST("ztq30_fj_jc/service.do")
+    @POST("ztq_sh_jc/service.do")
     Observable<BasePackDown> getData(@Part MultipartBody.Part filePart, @Part("p") BasePackUp request);
 }

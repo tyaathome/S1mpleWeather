@@ -11,8 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.ObservableSource;
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -20,6 +18,7 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
+import io.realm.Realm;
 import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -183,7 +182,7 @@ public class PackDataManager {
         List<Observable<RealmObject>> observables = new ArrayList<>();
         for (BasePackUp up : sources) {
             Observable<RealmObject> observable = create(emitter -> {
-                RealmObject object = up.getCacheData();
+                RealmObject object = up.getCacheData(Realm.getDefaultInstance());
                 emitter.onNext(object);
                 emitter.onComplete();
             });
@@ -246,24 +245,8 @@ public class PackDataManager {
     public static void zipCache(Iterable<? extends BasePackUp> sources, MyObserver<RealmObject[]> observer) {
         List<Observable<RealmObject>> observables = new ArrayList<>();
         for (BasePackUp up : sources) {
-            Observable<RealmObject> observable = Observable.create(new ObservableOnSubscribe<RealmObject>() {
-                @Override
-                public void subscribe(ObservableEmitter<RealmObject> emitter) throws Exception {
-                    RealmObject object = up.getCacheData();
-                    if(object != null) {
-                        emitter.onNext(object);
-                    }
-                    emitter.onComplete();
-                }
-            })
-                    .observeOn(AndroidSchedulers.mainThread()) //调度线程至主线程进行realmobject拷贝
-                    .map(realmObject -> {
-                        RealmObject result = realmObject.getRealm().copyFromRealm(realmObject);
-                        if(!realmObject.getRealm().isClosed()) {
-                            realmObject.getRealm().close();
-                        }
-                        return result;
-                    });
+            Observable<RealmObject> observable = Observable.just(up)
+                    .map(basePackUp -> basePackUp.getCacheData(Realm.getDefaultInstance()));
             observables.add(observable);
         }
         Observable.zip(observables, objects -> {
@@ -275,10 +258,9 @@ public class PackDataManager {
             }
             return list.toArray(new RealmObject[list.size()]);
         })
-            .subscribeOn(Schedulers.computation())
+            .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Observer<RealmObject[]>() {
-
 
                 @Override
                 public void onSubscribe(Disposable d) {
@@ -287,7 +269,7 @@ public class PackDataManager {
 
                 @Override
                 public void onNext(RealmObject[] realmObject) {
-                    if (observer != null) {
+                    if(observer != null) {
                         observer.onNext(realmObject);
                     }
                 }

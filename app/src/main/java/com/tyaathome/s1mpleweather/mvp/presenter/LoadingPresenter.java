@@ -18,9 +18,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.ObservableSource;
-import io.reactivex.functions.Function;
-import io.reactivex.internal.functions.Functions;
+import io.reactivex.Observer;
+import io.reactivex.disposables.Disposable;
 
 /**
  * loading presenter
@@ -32,7 +31,6 @@ public class LoadingPresenter implements LoadingContract.Presenter {
     private LoadingContract.View mView;
     private Context mContext;
     private static final int RETRY_COUNT = 3;
-    private boolean isCompleteLocation = true;
 
     public LoadingPresenter(Context context) {
         mContext = context;
@@ -41,30 +39,71 @@ public class LoadingPresenter implements LoadingContract.Presenter {
     @SuppressLint("CheckResult")
     @Override
     public void beginLocation() {
-        isCompleteLocation = false;
         // 定位observable
         Observable<Integer> locationObservable = Observable.create((ObservableOnSubscribe<Integer>) emitter -> {
-                    if (!emitter.isDisposed() && !isCompleteLocation) {
-                        LocationTools.getInstance(mContext).startLocation(emitter);
+            LocationTools.getInstance(mContext).startLocation(new LocationTools.OnLocationListener() {
+                @Override
+                public void onComplete() {
+                    if (!emitter.isDisposed()) {
+                        emitter.onComplete();
                     }
                 }
-        ).retryWhen(throwableObservable -> throwableObservable
-                .zipWith(Observable.range(1, RETRY_COUNT), (throwable, integer) -> {
-                    if (integer >= RETRY_COUNT) {
-                        Log.e("LoadingPresenter", "finish" + String.valueOf(integer));
-                        isCompleteLocation = true;
+
+                @Override
+                public void onStop(String errorMessage) {
+                    if (!emitter.isDisposed()) {
+                        emitter.onError(new RuntimeException(errorMessage));
                     }
-                    Log.e("LoadingPresenter", "count:" + String.valueOf(integer));
-                    return integer;
-                }).flatMap((Function<Integer, ObservableSource<?>>) integer -> Observable.timer(1, TimeUnit.SECONDS)));
+                }
+            });
+        })
+                // 设置单次定位的超时时间
+                .timeout(5, TimeUnit.SECONDS, Observable.create(emitter ->
+                        emitter.onError(new RuntimeException("locationObservable time out"))))
+                // 设置重试次数
+                .retryWhen(throwableObservable -> throwableObservable
+                        .zipWith(Observable.range(1, RETRY_COUNT), (throwable, integer) -> {
+                            Log.e("LoadingPresenter", "count:" + String.valueOf(integer));
+                            return integer;
+                        })
+                        // 设置重试等待时间
+                        .flatMap(integer -> Observable.timer(1, TimeUnit.SECONDS)));
 
         // 首页数据请求observable
-        Observable dataObservable = Observable.create((ObservableOnSubscribe) emitter -> {
+
+//        Observable dataObservable = Observable.just(CityTools.getInstance(mContext).getLocationCity())
+//                .filter(locationCityBean -> locationCityBean != null)
+//                .flatMap(locationCityBean ->
+//                        ObservableManager.getZipObservable(AutoDownloadManager.getMainData(locationCityBean.getId())))
+//                .flatMap(o -> Observable.just(o).timeout(3, TimeUnit.SECONDS, Observable.empty()));
+
+        Observable dataObservable = Observable.create(emitter -> {
             LocationCityBean city = CityTools.getInstance(mContext).getLocationCity();
             if (city != null) {
                 ObservableManager
                         .getZipObservable(AutoDownloadManager.getMainData(city.getId()))
-                        .subscribe(Functions.emptyConsumer(), Functions.ON_ERROR_MISSING, () -> emitter.onComplete());
+                        .timeout(3, TimeUnit.SECONDS, Observable.empty())
+                        .subscribe(new Observer<Object>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onNext(Object o) {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                mView.gotoNextActivity();
+                            }
+
+                            @Override
+                            public void onComplete() {
+                                mView.gotoNextActivity();
+                            }
+                        });
             } else {
                 emitter.onComplete();
             }

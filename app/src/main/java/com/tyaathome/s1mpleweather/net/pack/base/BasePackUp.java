@@ -2,6 +2,7 @@ package com.tyaathome.s1mpleweather.net.pack.base;
 
 import org.json.JSONObject;
 
+import io.realm.Realm;
 import io.realm.RealmObject;
 
 /**
@@ -11,5 +12,13 @@ import io.realm.RealmObject;
 public abstract class BasePackUp<T extends RealmObject> {
     abstract public JSONObject toJSON();
     abstract public String getName();
-    abstract public T getCacheData();
+    abstract protected T queryData(Realm realm);
+
+    public T getCacheData(Realm realm) {
+        if(realm != null) {
+            T result = queryData(realm);
+            return realm.copyFromRealm(result);
+        }
+        return null;
+    }
 }

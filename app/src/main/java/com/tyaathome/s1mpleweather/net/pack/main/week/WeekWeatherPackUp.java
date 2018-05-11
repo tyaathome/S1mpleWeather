@@ -38,8 +38,8 @@ public class WeekWeatherPackUp extends BasePackUp<WeekWeatherBean> {
     }
 
     @Override
-    public WeekWeatherBean getCacheData() {
-        return Realm.getDefaultInstance().where(WeekWeatherBean.class).equalTo("key", id).findFirst();
+    protected WeekWeatherBean queryData(Realm realm) {
+        return realm.where(WeekWeatherBean.class).equalTo("key", id).findFirst();
     }
 
 }

@@ -49,7 +49,7 @@ public class AppService {
 
     public Retrofit create() {
         mRetrofit = new Retrofit.Builder()
-                .baseUrl("http://www.fjqxfw.cn:8096/")
+                .baseUrl("http://ztq.soweather.com:8096/")
                 .addConverterFactory(MyConverterFactory.create())
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();

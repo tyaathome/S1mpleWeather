@@ -37,8 +37,8 @@ public class SstqPackUp extends BasePackUp<SstqBean> {
     }
 
     @Override
-    public SstqBean getCacheData() {
-        return Realm.getDefaultInstance().where(SstqBean.class).equalTo("key", area).findFirst();
+    protected SstqBean queryData(Realm realm) {
+        return realm.where(SstqBean.class).equalTo("key", area).findFirst();
     }
 
 }

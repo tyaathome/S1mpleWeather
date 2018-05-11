@@ -18,7 +18,6 @@ import com.amap.api.services.geocoder.RegeocodeResult;
 import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
 import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 
-import io.reactivex.ObservableEmitter;
 import io.realm.Realm;
 
 /**
@@ -38,8 +37,9 @@ public class LocationTools {
     private static final long LOCATION_TIME = 5 * 60 * 1000;
     // 定位回调
     private OnCompleteListener mOnCompleteListener;
-    private ObservableEmitter emitter;
+    //private ObservableEmitter emitter;
     private static final boolean TEST = false;
+    private OnLocationListener onLocationListener;
 
     private LocationTools(Context context) {
         mContext = context;
@@ -78,25 +78,23 @@ public class LocationTools {
 
     /**
      * 开始定位
-     * @param emitter
+     * @param listener
      */
-    public void startLocation(ObservableEmitter emitter) {
+    public void startLocation(OnLocationListener listener) {
         startLocation();
-        this.emitter = emitter;
+        onLocationListener = listener;
     }
 
-    public void stopLocation(String message) {
+    public void stopLocation() {
         if(mAMapLocationClient != null) {
             mAMapLocationClient.stopLocation();
-        }
-        if(emitter != null && !emitter.isDisposed()) {
-            emitter.onError(new RuntimeException(message));
         }
     }
 
     private void finishLocation() {
-        if(emitter != null && !emitter.isDisposed()) {
-            emitter.onComplete();
+        stopLocation();
+        if(onLocationListener != null) {
+            onLocationListener.onComplete();
         }
     }
 
@@ -160,8 +158,8 @@ public class LocationTools {
     private AMapLocationListener aMapLocationListener = new AMapLocationListener() {
         @Override
         public void onLocationChanged(AMapLocation aMapLocation) {
-            if(aMapLocation == null) {
-                stopLocation("location error");
+            if(aMapLocation == null || aMapLocation.getLatitude() == 0.0d || aMapLocation.getLongitude() == 0.0d) {
+                stopLocation();
                 return;
             }
             if(TEST) {
@@ -205,6 +203,11 @@ public class LocationTools {
      */
     public interface OnCompleteListener {
         void OnComplete();
+    }
+
+    public interface OnLocationListener {
+        void onComplete();
+        void onStop(String errorMessage);
     }
 
     private static class AMapBean {
