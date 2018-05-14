@@ -70,13 +70,6 @@ public class LoadingPresenter implements LoadingContract.Presenter {
                         .flatMap(integer -> Observable.timer(1, TimeUnit.SECONDS)));
 
         // 首页数据请求observable
-
-//        Observable dataObservable = Observable.just(CityTools.getInstance(mContext).getLocationCity())
-//                .filter(locationCityBean -> locationCityBean != null)
-//                .flatMap(locationCityBean ->
-//                        ObservableManager.getZipObservable(AutoDownloadManager.getMainData(locationCityBean.getId())))
-//                .flatMap(o -> Observable.just(o).timeout(3, TimeUnit.SECONDS, Observable.empty()));
-
         Observable dataObservable = Observable.create(emitter -> {
             LocationCityBean city = CityTools.getInstance(mContext).getLocationCity();
             if (city != null) {

@@ -58,25 +58,16 @@ public class CityPresenter implements CityContract.Presenter {
         if(TextUtils.isEmpty(key)) {
            return;
         }
-//        SstqPackUp sstqPackUp = new SstqPackUp(key);
-//        WeekWeatherPackUp weekWeatherPackUp = new WeekWeatherPackUp(key);
-//        List<BasePackUp> packList = new ArrayList<>();
-//        packList.add(sstqPackUp);
-//        packList.add(weekWeatherPackUp);
-
         List<BasePackUp> packList = AutoDownloadManager.getMainData(key);
-
         // 合并请求缓存数据
-        //PackDataManager.mergeCache(packList, requestObserver);
-        PackDataManager.zipCache(packList, myObserver);
+        PackDataManager.zipCache(packList, observerCache);
         // 合并请求网络数据
-        //PackDataManager.mergeRequest(packList, requestObserver);
-        PackDataManager.zipRequest(packList, myObserver2);
+        PackDataManager.zipRequest(packList, observerNet);
 
 
     }
 
-    private MyObserver<RealmObject[]> myObserver = new MyObserver<RealmObject[]>() {
+    private MyObserver<RealmObject[]> observerCache = new MyObserver<RealmObject[]>() {
         @Override
         public void onNext(RealmObject[] realmObject) {
             for(RealmObject bean : realmObject) {
@@ -107,7 +98,7 @@ public class CityPresenter implements CityContract.Presenter {
         }
     };
 
-    private MyObserver<RealmObject[]> myObserver2 = new MyObserver<RealmObject[]>() {
+    private MyObserver<RealmObject[]> observerNet = new MyObserver<RealmObject[]>() {
         @Override
         public void onNext(RealmObject[] realmObject) {
             for(RealmObject bean : realmObject) {
@@ -115,7 +106,6 @@ public class CityPresenter implements CityContract.Presenter {
                     sstqBean = (SstqBean) bean;
                 } else if (bean instanceof WeekWeatherBean) {
                     weekWeatherBean = (WeekWeatherBean) bean;
-
                 }
             }
         }
