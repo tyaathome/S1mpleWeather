@@ -1,8 +1,11 @@
 package com.tyaathome.s1mpleweather.ui.activity;
 
+import android.annotation.SuppressLint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.tyaathome.s1mpleweather.R;
@@ -25,6 +28,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private ViewPager viewPager;
     private CityFragmentAdapter adapter;
     private TextView tvCityName;
+    private ViewGroup layoutRoot;
     private int count = 5;
     private List<String> dataList = new ArrayList<>();
     private String[] cityList = {"1278", "1233", "10955", "1069", "1099", "30828", "1163", "1234", "1214"};
@@ -37,6 +41,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        layoutRoot = findViewById(R.id.layout_root);
         viewPager = findViewById(R.id.viewPager);
         tvCityName = findViewById(R.id.tv_city_name);
     }
@@ -74,9 +79,13 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     };
 
     private ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
+        @SuppressLint("CheckResult")
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+            if(dataList.size() > position) {
+                presenter.preperBackgroundData(dataList.get(position));
+                //presenter.preperBackgroundData(String.valueOf(position));
+            }
         }
 
         @Override
@@ -88,4 +97,9 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
         }
     };
+
+    @Override
+    public void setBackground(Drawable drawable) {
+        layoutRoot.setBackgroundDrawable(drawable);
+    }
 }

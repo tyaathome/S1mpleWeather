@@ -1,7 +1,12 @@
 package com.tyaathome.s1mpleweather.utils;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -139,5 +144,105 @@ public class CommonUtils {
         }
         return null;
     }
+
+    /**
+     * 获取天气背景图片
+     * @param context
+     * @param s
+     * @return
+     */
+    public static BitmapDrawable getWeatherBackground(Context context, String s) {
+        String prefix = "bgs/";
+        String name = "";
+        String suffix = ".jpg";
+        if (TextUtils.isEmpty(s)) {
+            name = "00";
+        } else {
+            switch (s) {
+                case "01":  // 多云
+                    name = "01";
+                    break;
+                case "02":  // 阴
+                    name = "02";
+                    break;
+                case "04":
+                case "05":  // 雷阵雨
+                    name = "04";
+                    break;
+                case "07":
+                case "03":
+                case "08":
+                case "09":
+                case "22":
+                case "10":
+                case "23":
+                case "24":
+                case "11":
+                case "25":
+                case "12":
+                case "21":  // 雨
+                    name = "07";
+                    break;
+                case "14":
+                case "06":
+                case "19":
+                case "15":
+                case "26":
+                case "13":
+                case "16":
+                case "27":
+                case "17":
+                case "28":  // 雪
+                    name = "14";
+                    break;
+                case "18":
+                case "32":  // 雾霾
+                    name = "18";
+                    break;
+                case "29":
+                case "30":
+                case "20":
+                case "31":  // 沙
+                    name = "29";
+                    break;
+                default:
+                    name = "00";
+                    break;
+            }
+        }
+        String path = prefix + name + suffix;
+        return getBitmapFromAssets(context, path);
+    }
+
+    /**
+     * 从assets获取图片
+     * @param context
+     * @param filePath
+     * @return
+     */
+    public static BitmapDrawable getBitmapFromAssets(Context context, String filePath) {
+        BitmapDrawable bitmapDrawable = null;
+        InputStream input = null;
+        AssetManager assetManager = context.getAssets();
+        try {
+            input = assetManager.open(filePath);
+            if(input != null) {
+                Bitmap bitmap = BitmapFactory.decodeStream(input);
+                bitmapDrawable = new BitmapDrawable(context.getResources(), bitmap);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if(input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return bitmapDrawable;
+    }
+
 
 }
