@@ -9,16 +9,16 @@ import android.view.ViewGroup;
 
 import com.tyaathome.s1mpleweather.ui.fragment.CityFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class CityFragmentAdapter extends FragmentStatePagerAdapter {
 
-    private List<String> dataList;
+    private List<String> dataList = new ArrayList<>();
     private SparseArray<Fragment> fragmentList = new SparseArray<>();
 
-    public CityFragmentAdapter(FragmentManager fm, List<String> dataList) {
+    public CityFragmentAdapter(FragmentManager fm) {
         super(fm);
-        this.dataList = dataList;
     }
 
     @Override
@@ -54,6 +54,11 @@ public class CityFragmentAdapter extends FragmentStatePagerAdapter {
 
     public Fragment getRegisteredFragment(int position) {
         return fragmentList.get(position);
+    }
+
+    public void setData(List<String> dataList) {
+        this.dataList = dataList;
+        notifyDataSetChanged();
     }
 
 }

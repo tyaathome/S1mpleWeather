@@ -4,14 +4,18 @@ import android.content.Context;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.TextUtils;
 
+import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
+import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 import com.tyaathome.s1mpleweather.model.bean.main.weekweather.WeekWeatherBean;
 import com.tyaathome.s1mpleweather.model.bean.main.weekweather.WeekWeatherInfoBean;
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.MainContract;
 import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackUp;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
+import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +36,8 @@ public class MainPresenter implements MainContract.Presenter {
     private ObservableEmitter<String> mEmitter;
     private MainContract.View mView;
     private static final String TAG = "MainPresenter";
+    private String[] cityList = {"1278", "1233", "10955", "1069", "1099", "30828", "1163", "1234", "1214"};
+    private List<String> selectedCityList = new ArrayList<>();
 
     public MainPresenter(Context context) {
         mContext = context;
@@ -44,17 +50,60 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void start() {
+        LocationCityBean location = CityTools.getInstance(mContext).getLocationCity();
+        selectedCityList.add(location.getId());
+        selectedCityList.addAll(Arrays.asList(cityList));
+        mView.setCityList(selectedCityList);
         initBackgroundObservable();
+        selectPage(0);
     }
 
-    @Override
-    public void preperBackgroundData(String cityid) {
+    private void preperBackgroundData(String cityid) {
         if(!TextUtils.isEmpty(cityid)) {
             if(mEmitter != null && !mEmitter.isDisposed()) {
                 mEmitter.onNext(cityid);
             } else {
                 initBackgroundObservable();
             }
+        }
+    }
+
+    private void searchCityNameById(String cityid) {
+        Observable.just(cityid)
+                .map(s -> CityTools.getInstance(mContext).getCityById(s))
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<CityBean>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(CityBean cityBean) {
+                        if(cityBean != null) {
+                            mView.setCurrentCityName(cityBean.getCity());
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+    }
+
+    @Override
+    public void selectPage(int position) {
+        if(selectedCityList.size()> position) {
+            String cityId = selectedCityList.get(position);
+            preperBackgroundData(cityId);
+            searchCityNameById(cityId);
         }
     }
 

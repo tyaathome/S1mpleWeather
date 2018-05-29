@@ -2,15 +2,18 @@ package com.tyaathome.s1mpleweather.utils.tools;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
 import com.tyaathome.s1mpleweather.model.bean.city.CityList;
 import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
+import com.tyaathome.s1mpleweather.utils.RealmUtils;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.Scanner;
 
 import io.realm.Realm;
@@ -133,14 +136,31 @@ public class CityTools {
         return null;
     }
 
+    public CityBean getCityById(String cityId) {
+        if(!TextUtils.isEmpty(cityId)) {
+            Realm realm = Realm.getDefaultInstance();
+            CityList cityList = realm.where(CityList.class).findFirst();
+            if (cityList != null) {
+                List<CityBean> list = cityList.getCityList().where().equalTo("id", cityId).findAll();
+                CityBean cityBean = cityList.getCityList().where().equalTo("id", cityId).findFirst();
+                return realm.copyFromRealm(cityBean);
+            }
+        }
+        return null;
+    }
+
     /**
      * 获取本地定位城市
      * @return 缓存定位城市
      */
     public LocationCityBean getLocationCity() {
-        return Realm.getDefaultInstance()
+        LocationCityBean bean = Realm.getDefaultInstance()
                 .where(LocationCityBean.class)
                 .findFirst();
+        if(bean != null) {
+            return RealmUtils.unmanage(bean);
+        }
+        return null;
     }
 
 }
