@@ -51,7 +51,9 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void start() {
         LocationCityBean location = CityTools.getInstance(mContext).getLocationCity();
-        selectedCityList.add(location.getId());
+        if(location != null && !TextUtils.isEmpty(location.getId())) {
+            selectedCityList.add(location.getId());
+        }
         selectedCityList.addAll(Arrays.asList(cityList));
         mView.setCityList(selectedCityList);
         initBackgroundObservable();
