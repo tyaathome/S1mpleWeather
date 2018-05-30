@@ -29,8 +29,10 @@
             android:name="com.amap.api.v2.apikey"
             android:value="1ce9ebf2f0ee9c21a19fd91cc94e01c5"/>
 
-        <activity android:name=".ui.activity.loading.LoadingActivity"
+        <activity
+            android:name=".ui.activity.loading.LoadingActivity"
             android:noHistory="true"
+            android:screenOrientation="portrait"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -38,7 +40,10 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.MainActivity"/>
+        <activity
+            android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait"
+            />
 
         <provider
             android:name=".ui.provider.CityContentProvider"
