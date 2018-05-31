@@ -5,6 +5,7 @@ import com.tyaathome.s1mpleweather.net.listener.OnCompleteWithDisposable;
 import com.tyaathome.s1mpleweather.net.listener.OnCompleted;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackDown;
 import com.tyaathome.s1mpleweather.net.pack.base.BasePackUp;
+import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.EntityImpl;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -195,99 +196,96 @@ public class PackDataManager {
 
     }
 
-    public static void zipRequest(Iterable<? extends BasePackUp> sources, MyObserver<RealmObject[]> observer) {
+    /**
+     * 网络请求
+     * @param sources
+     * @param function
+     * @param observer
+     */
+    public static void combineNet(Iterable<? extends BasePackUp> sources,
+                           Function<Object[], List<EntityImpl>> function,
+                           MyObserver<List<EntityImpl>> observer) {
         List<Observable<RealmObject>> observableList = new ArrayList<>();
         for (BasePackUp up : sources) {
             Observable<RealmObject> observable = AppService.getInstance().getApi().getData(up)
                     .map(BasePackDown::getData);
             observableList.add(observable);
         }
-        Observable.zip(observableList, objects -> {
-            List<RealmObject> list = new ArrayList<>();
-            for (Object o : objects) {
-                if (o instanceof RealmObject) {
-                    list.add((RealmObject) o);
-                }
-            }
-            return list.toArray(new RealmObject[list.size()]);
-        })
+        Observable.combineLatest(observableList, function)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<RealmObject[]>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
+                .subscribe(new Observer<List<EntityImpl>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
 
-                    }
+            }
 
-                    @Override
-                    public void onNext(RealmObject[] realmObject) {
-                        if (observer != null) {
-                            observer.onNext(realmObject);
-                        }
-                    }
+            @Override
+            public void onNext(List<EntityImpl> entityList) {
+                if (observer != null) {
+                    observer.onNext(entityList);
+                }
+            }
 
-                    @Override
-                    public void onError(Throwable t) {
-                        if (observer != null) {
-                            observer.onError(t);
-                        }
-                    }
+            @Override
+            public void onError(Throwable e) {
+                if (observer != null) {
+                    observer.onError(e);
+                }
+            }
 
-                    @Override
-                    public void onComplete() {
-                        if (observer != null) {
-                            observer.onComplete();
-                        }
-                    }
-                });
+            @Override
+            public void onComplete() {
+                if (observer != null) {
+                    observer.onComplete();
+                }
+            }
+        });
     }
 
-    public static void zipCache(Iterable<? extends BasePackUp> sources, MyObserver<RealmObject[]> observer) {
+    /**
+     * 缓存数据
+     * @param sources
+     * @param function
+     * @param observer
+     */
+    public static void combineCache(Iterable<? extends BasePackUp> sources,
+                             Function<Object[], List<EntityImpl>> function,
+                             MyObserver<List<EntityImpl>> observer) {
         List<Observable<RealmObject>> observables = new ArrayList<>();
         for (BasePackUp up : sources) {
             Observable<RealmObject> observable = Observable.just(up)
                     .map(basePackUp -> basePackUp.getCacheData(Realm.getDefaultInstance()));
             observables.add(observable);
         }
-        Observable.zip(observables, objects -> {
-            List<RealmObject> list = new ArrayList<>();
-            for (Object object : objects) {
-                if (object instanceof RealmObject) {
-                    list.add((RealmObject) object);
+
+        Observable.combineLatest(observables, function).subscribe(new Observer<List<EntityImpl>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onNext(List<EntityImpl> entityList) {
+                if (observer != null) {
+                    observer.onNext(entityList);
                 }
             }
-            return list.toArray(new RealmObject[list.size()]);
-        })
-            .subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe(new Observer<RealmObject[]>() {
 
-                @Override
-                public void onSubscribe(Disposable d) {
-
+            @Override
+            public void onError(Throwable e) {
+                if (observer != null) {
+                    observer.onError(e);
                 }
+            }
 
-                @Override
-                public void onNext(RealmObject[] realmObject) {
-                    if(observer != null) {
-                        observer.onNext(realmObject);
-                    }
+            @Override
+            public void onComplete() {
+                if (observer != null) {
+                    observer.onComplete();
                 }
-
-                @Override
-                public void onError(Throwable t) {
-                    if (observer != null) {
-                        observer.onError(t);
-                    }
-                }
-
-                @Override
-                public void onComplete() {
-                    if (observer != null) {
-                        observer.onComplete();
-                    }
-                }
-            });
+            }
+        });
     }
 
 }

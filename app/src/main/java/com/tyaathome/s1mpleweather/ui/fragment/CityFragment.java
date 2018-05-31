@@ -19,6 +19,7 @@ import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.MainEntity;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 import in.srain.cube.views.ptr.PtrDefaultHandler;
 import in.srain.cube.views.ptr.PtrFrameLayout;
@@ -27,7 +28,7 @@ import in.srain.cube.views.ptr.PtrHandler;
 @LayoutID(R.layout.fragment_city)
 public class CityFragment extends BaseFragment implements CityContract.View {
 
-    private BasePresenter presenter;
+    private CityPresenter presenter;
     private ViewGroup rootLayout;
     private MainViewController mainViewController;
     private ForecastViewController forecastViewController;
@@ -44,7 +45,10 @@ public class CityFragment extends BaseFragment implements CityContract.View {
     public void initViews(Bundle savedInstanceState) {
         rootLayout = findViewById(R.id.layout_root);
         initRefresh();
-        getView().post(this::initViewController);
+        Objects.requireNonNull(getView()).post(() -> {
+            initViewController();
+            requestData();
+        });
     }
 
     @Override
@@ -86,6 +90,17 @@ public class CityFragment extends BaseFragment implements CityContract.View {
                 //requestData(true);
             }
         });
+    }
+
+    /**
+     * 请求数据
+     */
+    private void requestData() {
+        Bundle bundle = getArguments();
+        if(bundle != null) {
+            String key = bundle.getString("key", "");
+            presenter.getData(key);
+        }
     }
 
     @Override

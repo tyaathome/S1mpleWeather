@@ -1,8 +1,6 @@
 package com.tyaathome.s1mpleweather.mvp.presenter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
 
@@ -21,15 +19,13 @@ import com.tyaathome.s1mpleweather.utils.manager.AutoDownloadManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmObject;
+import io.reactivex.functions.Function;
 
 public class CityPresenter implements CityContract.Presenter {
 
     private Context context;
     private Fragment currentFragment;
     private CityContract.View view;
-    private SstqBean sstqBean;
-    private WeekWeatherBean weekWeatherBean;
 
     public CityPresenter(Fragment fragment) {
         this.context = fragment.getContext();
@@ -43,71 +39,45 @@ public class CityPresenter implements CityContract.Presenter {
 
     @Override
     public void start() {
-        if(currentFragment != null) {
-            Bundle bundle = currentFragment.getArguments();
-            String key = bundle.getString("key", "");
-            if(!TextUtils.isEmpty(key)) {
-                getData(key);
-            }
-        }
+
     }
 
-    @SuppressLint("CheckResult")
     @Override
     public void getData(String key) {
-        if(TextUtils.isEmpty(key)) {
-           return;
+        if (!TextUtils.isEmpty(key)) {
+            List<BasePackUp> packList = AutoDownloadManager.getMainData(key);
+            // 合并请求缓存数据
+            PackDataManager.combineCache(packList, combineFunction, observerCache);
+            // 合并请求网络数据
+            PackDataManager.combineNet(packList, combineFunction, observerNet);
         }
-        List<BasePackUp> packList = AutoDownloadManager.getMainData(key);
-        // 合并请求缓存数据
-        PackDataManager.zipCache(packList, observerCache);
-        // 合并请求网络数据
-        PackDataManager.zipRequest(packList, observerNet);
-
-
     }
 
-    private MyObserver<RealmObject[]> observerCache = new MyObserver<RealmObject[]>() {
-        @Override
-        public void onNext(RealmObject[] realmObject) {
-            for(RealmObject bean : realmObject) {
-                if (bean instanceof SstqBean) {
-                    sstqBean = (SstqBean) bean;
-                } else if (bean instanceof WeekWeatherBean) {
-                    weekWeatherBean = (WeekWeatherBean) bean;
-                }
+    private Function<Object[], List<EntityImpl>> combineFunction = objects -> {
+        SstqBean sstqBean = null;
+        WeekWeatherBean weekWeatherBean = null;
+        for(Object bean : objects) {
+            if (bean instanceof SstqBean) {
+                sstqBean = (SstqBean) bean;
+            } else if (bean instanceof WeekWeatherBean) {
+                weekWeatherBean = (WeekWeatherBean) bean;
             }
         }
-
-        @Override
-        public void onError(Throwable e) {
-
-        }
-
-        @Override
-        public void onComplete() {
-            // 首页组件数据填充
-            List<EntityImpl> entityList = new ArrayList<>();
-            // 第一屏数据
-            MainEntity mainEntity = new MainEntity(sstqBean, weekWeatherBean);
-            entityList.add(mainEntity);
-            // 预报数据
-            ForecastEntity forecastEntity = new ForecastEntity(weekWeatherBean);
-            entityList.add(forecastEntity);
-            view.fillData(entityList, "cache");
-        }
+        // 首页组件数据填充
+        List<EntityImpl> entityList = new ArrayList<>();
+        // 第一屏数据
+        MainEntity mainEntity = new MainEntity(sstqBean, weekWeatherBean);
+        entityList.add(mainEntity);
+        // 预报数据
+        ForecastEntity forecastEntity = new ForecastEntity(weekWeatherBean);
+        entityList.add(forecastEntity);
+        return entityList;
     };
 
-    private MyObserver<RealmObject[]> observerNet = new MyObserver<RealmObject[]>() {
+    private MyObserver<List<EntityImpl>> observerCache = new MyObserver<List<EntityImpl>>() {
         @Override
-        public void onNext(RealmObject[] realmObject) {
-            for(RealmObject bean : realmObject) {
-                if (bean instanceof SstqBean) {
-                    sstqBean = (SstqBean) bean;
-                } else if (bean instanceof WeekWeatherBean) {
-                    weekWeatherBean = (WeekWeatherBean) bean;
-                }
-            }
+        public void onNext(List<EntityImpl> entityList) {
+            view.fillData(entityList, "cache");
         }
 
         @Override
@@ -117,15 +87,23 @@ public class CityPresenter implements CityContract.Presenter {
 
         @Override
         public void onComplete() {
-            // 首页组件数据填充
-            List<EntityImpl> entityList = new ArrayList<>();
-            // 第一屏数据
-            MainEntity mainEntity = new MainEntity(sstqBean, weekWeatherBean);
-            entityList.add(mainEntity);
-//            // 预报数据
-            ForecastEntity forecastEntity = new ForecastEntity(weekWeatherBean);
-            entityList.add(forecastEntity);
+
+        }
+    };
+    private MyObserver<List<EntityImpl>> observerNet = new MyObserver<List<EntityImpl>>() {
+        @Override
+        public void onNext(List<EntityImpl> entityList) {
             view.fillData(entityList, "net");
+        }
+
+        @Override
+        public void onError(Throwable e) {
+
+        }
+
+        @Override
+        public void onComplete() {
+
         }
     };
 
