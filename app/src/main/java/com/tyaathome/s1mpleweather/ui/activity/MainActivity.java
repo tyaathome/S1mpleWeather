@@ -1,6 +1,5 @@
 package com.tyaathome.s1mpleweather.ui.activity;
 
-import android.annotation.SuppressLint;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -17,6 +16,9 @@ import com.tyaathome.s1mpleweather.ui.adapter.city.CityFragmentAdapter;
 
 import java.util.List;
 
+/**
+ * 首页
+ */
 @LayoutID(R.layout.activity_main)
 public class MainActivity extends BaseActivity implements MainContract.View {
 
@@ -25,6 +27,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private CityFragmentAdapter adapter;
     private TextView tvCityName;
     private ViewGroup layoutRoot;
+    private ViewGroup layoutTitle;
     private int count = 5;
 
     @Override
@@ -38,6 +41,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         layoutRoot = findViewById(R.id.layout_root);
         viewPager = findViewById(R.id.viewPager);
         tvCityName = findViewById(R.id.tv_city_name);
+        layoutTitle = findViewById(R.id.layout_title);
     }
 
     @Override
@@ -46,7 +50,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(onPageChangeListener);
         //viewPager.setOffscreenPageLimit(9);
-        tvCityName.setOnClickListener(onClickListener);
+        layoutTitle.setOnClickListener(onClickListener);
     }
 
     @Override
@@ -66,13 +70,14 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
     private View.OnClickListener onClickListener = v -> {
         switch (v.getId()) {
-            case R.id.tv_city_name:
+            case R.id.layout_title:
+                presenter.gotoSelectCity();
                 break;
         }
     };
 
     private ViewPager.OnPageChangeListener onPageChangeListener = new ViewPager.OnPageChangeListener() {
-        @SuppressLint("CheckResult")
+
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 

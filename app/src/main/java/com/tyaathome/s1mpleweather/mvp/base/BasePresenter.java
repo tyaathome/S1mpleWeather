@@ -5,7 +5,7 @@ package com.tyaathome.s1mpleweather.mvp.base;
  * Created by tyaathome on 2018/2/23.
  */
 
-public interface BasePresenter<T extends BaseView> {
-    void attachView(T view);
+public interface BasePresenter {
+    <T extends BaseView> void attachView(T view);
     void start();
 }

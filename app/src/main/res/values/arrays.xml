@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="popular_city">
+        <item>1278</item> <!-- 北京 -->
+        <item>1233</item> <!-- 上海 -->
+        <item>1206</item> <!-- 广州 -->
+        <item>1214</item> <!-- 深圳 -->
+        <item>1279</item> <!-- 天津 -->
+        <item>1171</item> <!-- 南京 -->
+        <item>1190</item> <!-- 杭州 -->
+        <item>1141</item> <!-- 武汉 -->
+        <item>1234</item> <!-- 重庆 -->
+        <item>1397</item> <!-- 成都 -->
+        <item>10955</item> <!-- 南昌 -->
+        <item>1099</item> <!-- 厦门 -->
+        <item>10780</item> <!-- 长沙 -->
+        <item>1321</item> <!-- 郑州 -->
+        <item>1318</item> <!-- 西安 -->
+        <item>1289</item> <!-- 济南 -->
+        <item>1069</item> <!-- 福州 -->
+        <item>1176</item> <!-- 合肥 -->
+        <item>1417</item> <!-- 香港 -->
+        <item>1418</item> <!-- 澳门 -->
+        <item>1419</item> <!-- 台北 -->
+    </string-array>
+</resources>

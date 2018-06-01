@@ -1,6 +1,7 @@
 package com.tyaathome.s1mpleweather.mvp.presenter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.text.TextUtils;
 
@@ -11,6 +12,7 @@ import com.tyaathome.s1mpleweather.model.bean.main.weekweather.WeekWeatherInfoBe
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.MainContract;
 import com.tyaathome.s1mpleweather.net.pack.main.week.WeekWeatherPackUp;
+import com.tyaathome.s1mpleweather.ui.activity.city.SearchCityActivity;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
 import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 
@@ -27,12 +29,10 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
-import io.realm.RealmObject;
 
 public class MainPresenter implements MainContract.Presenter {
 
     private Context mContext;
-    private List<RealmObject> preperData = new ArrayList<>();
     private ObservableEmitter<String> mEmitter;
     private MainContract.View mView;
     private static final String TAG = "MainPresenter";
@@ -109,6 +109,12 @@ public class MainPresenter implements MainContract.Presenter {
         }
     }
 
+    @Override
+    public void gotoSelectCity() {
+        Intent intent = new Intent(mContext, SearchCityActivity.class);
+        mContext.startActivity(intent);
+    }
+
     /**
      * 初始化更改背景的observable
      */
@@ -147,7 +153,6 @@ public class MainPresenter implements MainContract.Presenter {
 
         @Override
         public void onNext(BitmapDrawable drawable) {
-            String name = Thread.currentThread().getName();
             mView.setBackground(drawable);
         }
 

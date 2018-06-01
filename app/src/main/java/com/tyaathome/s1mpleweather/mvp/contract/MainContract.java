@@ -17,6 +17,7 @@ public interface MainContract {
 
     interface Presenter extends BasePresenter {
         void selectPage(int position);
+        void gotoSelectCity();
     }
 
 }

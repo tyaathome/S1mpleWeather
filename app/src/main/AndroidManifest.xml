@@ -40,8 +40,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- 首页 -->
         <activity
             android:name=".ui.activity.MainActivity"
+            android:screenOrientation="portrait"
+            />
+        <!-- 搜索城市 -->
+        <activity android:name=".ui.activity.city.SearchCityActivity"
             android:screenOrientation="portrait"
             />
 

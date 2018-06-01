@@ -35,7 +35,6 @@ public abstract class BaseFragment extends Fragment implements BaseView {
         return InjectManager.inject(this, container);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);

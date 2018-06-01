@@ -6,7 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -33,6 +33,17 @@ public class CommonUtils {
         }
         return null;
     }
+
+    /**
+     * dp转px
+     * @param context
+     * @param dpValue
+     * @return
+     */
+    public static float dp2px(Context context, float dpValue) {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dpValue, context.getResources().getDisplayMetrics());
+    }
+
 
     /**
      * z: 获取屏幕的高和宽
@@ -153,65 +164,74 @@ public class CommonUtils {
      */
     public static BitmapDrawable getWeatherBackground(Context context, String s) {
         String prefix = "bgs/";
-        String name = "";
+        String name = getWeatherName(s);
         String suffix = ".jpg";
-        if (TextUtils.isEmpty(s)) {
-            name = "00";
-        } else {
-            switch (s) {
-                case "01":  // 多云
-                    name = "01";
-                    break;
-                case "02":  // 阴
-                    name = "02";
-                    break;
-                case "04":
-                case "05":  // 雷阵雨
-                    name = "04";
-                    break;
-                case "07":
-                case "03":
-                case "08":
-                case "09":
-                case "22":
-                case "10":
-                case "23":
-                case "24":
-                case "11":
-                case "25":
-                case "12":
-                case "21":  // 雨
-                    name = "07";
-                    break;
-                case "14":
-                case "06":
-                case "19":
-                case "15":
-                case "26":
-                case "13":
-                case "16":
-                case "27":
-                case "17":
-                case "28":  // 雪
-                    name = "14";
-                    break;
-                case "18":
-                case "32":  // 雾霾
-                    name = "18";
-                    break;
-                case "29":
-                case "30":
-                case "20":
-                case "31":  // 沙
-                    name = "29";
-                    break;
-                default:
-                    name = "00";
-                    break;
-            }
-        }
         String path = prefix + name + suffix;
         return getBitmapFromAssets(context, path);
+    }
+
+    /**
+     * 获取天气名称
+     * @param s 天气序号
+     * @return 天气名称
+     */
+    private static String getWeatherName(String s) {
+        String name;
+        switch (s) {
+            case "00": // 晴 sunshine
+                name = "sunshine";
+                break;
+            case "01":  // 多云 cloudy
+                name = "cloudy";
+                break;
+            case "02":  // 阴 overcast
+                name = "overcast";
+                break;
+            case "04":
+            case "05":  // 雷阵雨 thunderstorm
+                name = "thunderstorm";
+                break;
+            case "07":
+            case "03":
+            case "08":
+            case "09":
+            case "22":
+            case "10":
+            case "23":
+            case "24":
+            case "11":
+            case "25":
+            case "12":
+            case "21":  // 雨 rain
+                name = "rain";
+                break;
+            case "14":
+            case "06":
+            case "19":
+            case "15":
+            case "26":
+            case "13":
+            case "16":
+            case "27":
+            case "17":
+            case "28":  // 雪 snow
+                name = "snow";
+                break;
+            case "18":
+            case "32":  // 雾霾 fog
+                name = "fog";
+                break;
+            case "29":
+            case "30":
+            case "20":
+            case "31":  // 沙 sandstorm
+                name = "sandstorm";
+                break;
+            default:
+                name = "sunshine"; // 晴 sunshine
+                break;
+        }
+        return name;
     }
 
     /**

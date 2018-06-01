@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
 import com.tyaathome.s1mpleweather.model.bean.city.CityList;
 import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
+import com.tyaathome.s1mpleweather.model.bean.city.SelectedCityList;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
 import com.tyaathome.s1mpleweather.utils.RealmUtils;
 
@@ -46,6 +47,7 @@ public class CityTools {
     private void init() {
         // 初始化城市列表
         initCityListToRealm();
+        initSelectedCityList();
     }
 
     /**
@@ -141,7 +143,6 @@ public class CityTools {
             Realm realm = Realm.getDefaultInstance();
             CityList cityList = realm.where(CityList.class).findFirst();
             if (cityList != null) {
-                List<CityBean> list = cityList.getCityList().where().equalTo("id", cityId).findAll();
                 CityBean cityBean = cityList.getCityList().where().equalTo("id", cityId).findFirst();
                 return realm.copyFromRealm(cityBean);
             }
@@ -159,6 +160,47 @@ public class CityTools {
                 .findFirst();
         if(bean != null) {
             return RealmUtils.unmanage(bean);
+        }
+        return null;
+    }
+
+    public void initSelectedCityList() {
+        SelectedCityList bean = Realm.getDefaultInstance().where(SelectedCityList.class).findFirst();
+        if(bean == null) {
+            Realm realm = Realm.getDefaultInstance();
+            realm.beginTransaction();
+            realm.copyToRealmOrUpdate(new SelectedCityList());
+            realm.commitTransaction();
+        }
+    }
+
+    /**
+     * 添加城市
+     * @param cityid
+     */
+    public void addCityToSelectedList(String cityid) {
+        CityBean cityBean = getCityById(cityid);
+        if(cityBean != null) {
+            Realm realm = Realm.getDefaultInstance();
+            SelectedCityList bean = realm.where(SelectedCityList.class).findFirst();
+            if(bean != null) {
+                List<CityBean> cityList = bean.getCityList().where().equalTo("id", cityid).findAll();
+                if(cityList != null && cityList.size() == 0) {
+                    realm.beginTransaction();
+                    bean.getCityList().add(cityBean);
+                    realm.commitTransaction();
+                }
+            }
+        }
+    }
+
+    public List<CityBean> getSelectedCityList() {
+        SelectedCityList bean = Realm.getDefaultInstance().where(SelectedCityList.class).findFirst();
+        if(bean != null) {
+            SelectedCityList list = RealmUtils.unmanage(bean);
+            if(list != null) {
+                return list.getCityList();
+            }
         }
         return null;
     }
