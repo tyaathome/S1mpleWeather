@@ -12,10 +12,16 @@ import java.util.List;
 public class SearchCityContract {
 
     public interface View extends BaseView {
+        // 更新热门城市列表
         void updateCityList(List<CityBean> cityList);
+        // 更新搜索结果的城市列表
+        void updateResultCityList(String key, List<CityBean> cityList);
     }
     public interface Presenter extends BasePresenter {
+        // 添加城市
         void addCity(CityBean cityBean);
+        // 搜索关键字
+        void queryKey(String key);
     }
 
 }

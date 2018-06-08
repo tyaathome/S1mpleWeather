@@ -3,7 +3,14 @@ package com.tyaathome.s1mpleweather.ui.activity.city;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.ViewStub;
+import android.widget.EditText;
 
 import com.tyaathome.s1mpleweather.R;
 import com.tyaathome.s1mpleweather.model.annonations.inject.LayoutID;
@@ -12,6 +19,7 @@ import com.tyaathome.s1mpleweather.mvp.base.BasePresenter;
 import com.tyaathome.s1mpleweather.mvp.contract.SearchCityContract;
 import com.tyaathome.s1mpleweather.mvp.presenter.SearchCityPresenter;
 import com.tyaathome.s1mpleweather.ui.activity.BaseActivity;
+import com.tyaathome.s1mpleweather.ui.adapter.city.CityResultAdapter;
 import com.tyaathome.s1mpleweather.ui.adapter.city.PopularCityAdapter;
 import com.tyaathome.s1mpleweather.ui.adapter.decoration.SpaceItemDecoration;
 import com.tyaathome.s1mpleweather.utils.CommonUtils;
@@ -28,6 +36,10 @@ public class SearchCityActivity extends BaseActivity implements SearchCityContra
     private SearchCityPresenter mPresenter;
     private RecyclerView rvPopularCity;
     private PopularCityAdapter popularCityAdapter;
+    private EditText etSearchCity;
+    private ViewStub viewStub;
+    private RecyclerView rvResultCity;
+    private CityResultAdapter cityResultAdapter;
 
     @Override
     protected BasePresenter onLoadPresenter() {
@@ -38,6 +50,8 @@ public class SearchCityActivity extends BaseActivity implements SearchCityContra
     @Override
     public void initViews(Bundle savedInstanceState) {
         initPopularCityList();
+        etSearchCity = findViewById(R.id.et_search_city);
+        viewStub = findViewById(R.id.layout_recycleview);
     }
 
     @SuppressLint("CheckResult")
@@ -46,6 +60,7 @@ public class SearchCityActivity extends BaseActivity implements SearchCityContra
         popularCityAdapter.getPositionClicks().subscribe(cityBean -> {
             mPresenter.addCity(cityBean);
         });
+        etSearchCity.addTextChangedListener(textWatcher);
     }
 
     private void initPopularCityList() {
@@ -62,4 +77,43 @@ public class SearchCityActivity extends BaseActivity implements SearchCityContra
     public void updateCityList(List<CityBean> cityList) {
         popularCityAdapter.updateSelectedCityList(cityList);
     }
+
+    @Override
+    public void updateResultCityList(String key, List<CityBean> cityList) {
+        if(cityList != null && cityList.size() > 0)
+        if(rvResultCity == null) {
+            rvResultCity = (RecyclerView) viewStub.inflate();
+            rvResultCity.setLayoutManager(new LinearLayoutManager(this));
+            cityResultAdapter = new CityResultAdapter(key, cityList);
+            rvResultCity.setAdapter(cityResultAdapter);
+        } else {
+            rvResultCity.setVisibility(View.VISIBLE);
+            cityResultAdapter.updateData(key, cityList);
+        }
+
+    }
+
+    private TextWatcher textWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+        }
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {
+            String key = s.toString();
+            if(!TextUtils.isEmpty(key)) {
+                mPresenter.queryKey(s.toString());
+            } else {
+                if(rvResultCity != null) {
+                    rvResultCity.setVisibility(View.GONE);
+                }
+            }
+        }
+
+        @Override
+        public void afterTextChanged(Editable s) {
+
+        }
+    };
 }

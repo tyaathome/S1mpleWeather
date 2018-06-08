@@ -5,8 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/layout_margin_normal"
     android:background="@color/bg_default"
+    android:padding="@dimen/layout_margin_normal"
     >
 
     <TextView
@@ -24,7 +24,6 @@
         android:id="@+id/et_search_city"
         android:layout_width="0dp"
         android:layout_height="35dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
@@ -37,7 +36,6 @@
         android:textColor="@color/colorWhite"
         android:textCursorDrawable="@null"
         android:textSize="@dimen/text_normal"
-        app:layout_constraintBottom_toTopOf="@+id/tv_popular_city"
         app:layout_constraintEnd_toStartOf="@+id/tv_cancel"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"/>
@@ -62,6 +60,17 @@
         android:layout_marginTop="@dimen/layout_margin_large"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_popular_city"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/tv_popular_city"/>
+
+    <ViewStub
+        android:id="@+id/layout_recycleview"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout="@layout/viewstub_recycleview"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_search_city"/>
+
 </android.support.constraint.ConstraintLayout>

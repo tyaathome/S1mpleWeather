@@ -40,4 +40,10 @@ public class SearchCityPresenter implements SearchCityContract.Presenter {
         }
     }
 
+    @Override
+    public void queryKey(String key) {
+        List<CityBean> cityList = CityTools.getInstance(mContext).getCityListByKey(key);
+        mView.updateResultCityList(key, cityList);
+    }
+
 }

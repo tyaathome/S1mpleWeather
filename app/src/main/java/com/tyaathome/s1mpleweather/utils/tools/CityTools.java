@@ -144,7 +144,9 @@ public class CityTools {
             CityList cityList = realm.where(CityList.class).findFirst();
             if (cityList != null) {
                 CityBean cityBean = cityList.getCityList().where().equalTo("id", cityId).findFirst();
-                return realm.copyFromRealm(cityBean);
+                if (cityBean != null) {
+                    return realm.copyFromRealm(cityBean);
+                }
             }
         }
         return null;
@@ -174,6 +176,15 @@ public class CityTools {
         }
     }
 
+    public CityList getCityList() {
+        CityList cityList = Realm.getDefaultInstance().where(CityList.class).findFirst();
+        return RealmUtils.unmanage(cityList);
+    }
+
+    private CityList getCityListWithoutUnmanage() {
+        return Realm.getDefaultInstance().where(CityList.class).findFirst();
+    }
+
     /**
      * 添加城市
      * @param cityid
@@ -194,6 +205,10 @@ public class CityTools {
         }
     }
 
+    /**
+     * 获取已选中的城市列表
+     * @return
+     */
     public List<CityBean> getSelectedCityList() {
         SelectedCityList bean = Realm.getDefaultInstance().where(SelectedCityList.class).findFirst();
         if(bean != null) {
@@ -201,6 +216,26 @@ public class CityTools {
             if(list != null) {
                 return list.getCityList();
             }
+        }
+        return null;
+    }
+
+    /**
+     * 通过关键字搜索城市列表
+     * @param key
+     * @return
+     */
+    public List<CityBean> getCityListByKey(String key) {
+        CityList cityList = getCityListWithoutUnmanage();
+        if(cityList != null && cityList.getCityList() != null) {
+            List<CityBean> cityBeanList = cityList.getCityList().where()
+                    .contains("province", key)
+                    .or()
+                    .contains("city", key)
+                    .or()
+                    .contains("county", key)
+                    .findAll();
+            return RealmUtils.unmanage(cityBeanList);
         }
         return null;
     }
