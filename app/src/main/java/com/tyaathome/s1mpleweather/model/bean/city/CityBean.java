@@ -1,12 +1,14 @@
 package com.tyaathome.s1mpleweather.model.bean.city;
 
+import java.io.Serializable;
+
 import io.realm.RealmObject;
 
 /**
  * Created by tyaathome on 2018/2/28.
  */
 
-public class CityBean extends RealmObject {
+public class CityBean extends RealmObject implements Serializable {
     // 城市id
     private String id = "";
     // 父id

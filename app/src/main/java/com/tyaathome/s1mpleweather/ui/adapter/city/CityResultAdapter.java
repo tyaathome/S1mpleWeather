@@ -2,7 +2,9 @@ package com.tyaathome.s1mpleweather.ui.adapter.city;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,9 @@ import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+
 /**
  * Created by tyaathome on 2018/06/07.
  */
@@ -22,6 +27,7 @@ public class CityResultAdapter extends RecyclerView.Adapter<CityResultAdapter.Vi
     private Context context;
     private String key;
     private List<CityBean> cityList;
+    private PublishSubject<CityBean> onClickSubject = PublishSubject.create();
 
     public CityResultAdapter(String key, List<CityBean> cityList) {
         this.key = key;
@@ -37,10 +43,18 @@ public class CityResultAdapter extends RecyclerView.Adapter<CityResultAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         CityBean cityBean = cityList.get(position);
-        String str = cityBean.getCounty() + ", " + cityBean.getCity() + ", " + cityBean.getProvince();
+        String str = cityBean.getCounty() + "，" + cityBean.getCity() + "，" + cityBean.getProvince();
         SpannableString spannableString = new SpannableString(str);
         List<Integer> indexs = getKeyIndexs(str, key);
-        holder.tv.setText(str);
+        int length = key.length();
+        for(int index : indexs) {
+            spannableString.setSpan(new ForegroundColorSpan(context.getResources().getColor(R.color.colorBuleLight)),
+                    index, index+length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        holder.tv.setText(spannableString);
+        holder.tv.setOnClickListener(v -> {
+            onClickSubject.onNext(cityBean);
+        });
     }
 
     @Override
@@ -64,6 +78,10 @@ public class CityResultAdapter extends RecyclerView.Adapter<CityResultAdapter.Vi
         this.key = key;
         this.cityList = cityList;
         notifyDataSetChanged();
+    }
+
+    public Observable<CityBean> getPositionClicks() {
+        return onClickSubject.hide();
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

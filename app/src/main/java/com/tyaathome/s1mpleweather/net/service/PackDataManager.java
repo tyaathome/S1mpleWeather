@@ -1,5 +1,7 @@
 package com.tyaathome.s1mpleweather.net.service;
 
+import com.tyaathome.s1mpleweather.model.bean.impl.Callback;
+import com.tyaathome.s1mpleweather.model.observable.DataObservable;
 import com.tyaathome.s1mpleweather.net.listener.MyObserver;
 import com.tyaathome.s1mpleweather.net.listener.OnCompleteWithDisposable;
 import com.tyaathome.s1mpleweather.net.listener.OnCompleted;
@@ -9,7 +11,9 @@ import com.tyaathome.s1mpleweather.ui.viewcontroller.entity.EntityImpl;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableSource;
@@ -19,7 +23,6 @@ import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.Realm;
 import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -183,7 +186,7 @@ public class PackDataManager {
         List<Observable<RealmObject>> observables = new ArrayList<>();
         for (BasePackUp up : sources) {
             Observable<RealmObject> observable = create(emitter -> {
-                RealmObject object = up.getCacheData(Realm.getDefaultInstance());
+                RealmObject object = up.getCacheData();
                 emitter.onNext(object);
                 emitter.onComplete();
             });
@@ -255,7 +258,7 @@ public class PackDataManager {
         List<Observable<RealmObject>> observables = new ArrayList<>();
         for (BasePackUp up : sources) {
             Observable<RealmObject> observable = Observable.just(up)
-                    .map(basePackUp -> basePackUp.getCacheData(Realm.getDefaultInstance()));
+                    .map(BasePackUp::getCacheData);
             observables.add(observable);
         }
 
@@ -286,6 +289,48 @@ public class PackDataManager {
                 }
             }
         });
+    }
+
+    public static Observable<?> zipRequest(List<BasePackUp> sources) {
+        DataObservable observable = new DataObservable(sources);
+
+        return Observable.zip(observable.getObservableList(), new Function<Object[], Object>() {
+            @Override
+            public Object apply(Object[] objects) throws Exception {
+                return Arrays.asList(objects);
+            }
+        }).subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    public static void requestList(List<BasePackUp> packUpList, Callback callback) {
+        zipRequest(packUpList)
+                .timeout(3, TimeUnit.SECONDS, Observable.empty())
+                .subscribe(new Observer<Object>() {
+                    @Override
+                    public void onSubscribe(Disposable d) {
+
+                    }
+
+                    @Override
+                    public void onNext(Object o) {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        if(callback != null) {
+                            callback.onCall();
+                        }
+                    }
+
+                    @Override
+                    public void onComplete() {
+                        if(callback != null) {
+                            callback.onCall();
+                        }
+                    }
+                });
     }
 
 }

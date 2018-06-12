@@ -15,7 +15,7 @@ import com.tyaathome.s1mpleweather.utils.manager.InjectManager;
 
 public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView {
 
-    protected P mPresenter;
+    private P mPresenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

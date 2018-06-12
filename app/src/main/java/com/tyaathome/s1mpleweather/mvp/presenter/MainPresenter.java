@@ -1,5 +1,6 @@
 package com.tyaathome.s1mpleweather.mvp.presenter;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
@@ -17,7 +18,6 @@ import com.tyaathome.s1mpleweather.utils.CommonUtils;
 import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -28,7 +28,8 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import io.realm.Realm;
+
+import static com.tyaathome.s1mpleweather.model.constant.ActivityRequestCodeConstant.GOTO_SELECT_CITY;
 
 public class MainPresenter implements MainContract.Presenter {
 
@@ -36,7 +37,6 @@ public class MainPresenter implements MainContract.Presenter {
     private ObservableEmitter<String> mEmitter;
     private MainContract.View mView;
     private static final String TAG = "MainPresenter";
-    private String[] cityList = {"1278", "1233", "10955", "1069", "1099", "30828", "1163", "1234", "1214"};
     private List<String> selectedCityList = new ArrayList<>();
 
     public MainPresenter(Context context) {
@@ -50,14 +50,8 @@ public class MainPresenter implements MainContract.Presenter {
 
     @Override
     public void start() {
-        LocationCityBean location = CityTools.getInstance(mContext).getLocationCity();
-        if(location != null && !TextUtils.isEmpty(location.getId())) {
-            selectedCityList.add(location.getId());
-        }
-        selectedCityList.addAll(Arrays.asList(cityList));
-        mView.setCityList(selectedCityList);
         initBackgroundObservable();
-        selectPage(0);
+        updateCityList(null);
     }
 
     private void preperBackgroundData(String cityid) {
@@ -106,13 +100,43 @@ public class MainPresenter implements MainContract.Presenter {
             String cityId = selectedCityList.get(position);
             preperBackgroundData(cityId);
             searchCityNameById(cityId);
+            mView.setPagerCurrentItem(position);
         }
     }
 
     @Override
     public void gotoSelectCity() {
         Intent intent = new Intent(mContext, SearchCityActivity.class);
-        mContext.startActivity(intent);
+        Activity activity = (Activity) mContext;
+        activity.startActivityForResult(intent, GOTO_SELECT_CITY);
+    }
+
+    @Override
+    public void updateCityList(CityBean cityBean) {
+        selectedCityList.clear();
+        LocationCityBean location = CityTools.getInstance(mContext).getLocationCity();
+        if(location != null && !TextUtils.isEmpty(location.getId())) {
+            selectedCityList.add(location.getId());
+        }
+        List<CityBean> cityList = CityTools.getInstance(mContext).getSelectedCityList();
+        List<String> cityIdList = new ArrayList<>();
+        for(CityBean bean : cityList) {
+            cityIdList.add(bean.getId());
+        }
+        selectedCityList.addAll(cityIdList);
+        mView.setCityList(selectedCityList);
+        if(cityBean == null) {
+            selectPage(0);
+            //mView.setPagerCurrentItem(0);
+        } else {
+            for(int i = 0; i < selectedCityList.size(); i++) {
+                String id = selectedCityList.get(i);
+                if(id.equals(cityBean.getId())) {
+                    //selectPage(i);
+                    mView.setPagerCurrentItem(i);
+                }
+            }
+        }
     }
 
     /**
@@ -132,7 +156,7 @@ public class MainPresenter implements MainContract.Presenter {
                 .observeOn(Schedulers.io())
                 .map(s -> {
                     WeekWeatherPackUp up = new WeekWeatherPackUp(s);
-                    WeekWeatherBean bean = up.getCacheData(Realm.getDefaultInstance());
+                    WeekWeatherBean bean = up.getCacheData();
                     if(bean != null && bean.getWeek() != null && bean.getWeek().size() > 1) {
                         WeekWeatherInfoBean infoBean =  bean.getWeek().get(1);
                         if(infoBean != null && !TextUtils.isEmpty(infoBean.getWd_day_ico())) {

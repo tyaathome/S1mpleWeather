@@ -16,6 +16,8 @@ public class SearchCityContract {
         void updateCityList(List<CityBean> cityList);
         // 更新搜索结果的城市列表
         void updateResultCityList(String key, List<CityBean> cityList);
+        // 跳转城市
+        void gotoCity(CityBean cityBean, boolean isfresh);
     }
     public interface Presenter extends BasePresenter {
         // 添加城市

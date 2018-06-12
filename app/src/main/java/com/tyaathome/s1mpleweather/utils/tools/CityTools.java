@@ -17,6 +17,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Scanner;
 
+import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmList;
 
@@ -234,6 +235,10 @@ public class CityTools {
                     .contains("city", key)
                     .or()
                     .contains("county", key)
+                    .or()
+                    .contains("pinyin", key, Case.INSENSITIVE)
+                    .or()
+                    .contains("pinyin_simple", key, Case.INSENSITIVE)
                     .findAll();
             return RealmUtils.unmanage(cityBeanList);
         }

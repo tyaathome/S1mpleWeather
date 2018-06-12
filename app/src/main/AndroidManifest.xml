@@ -47,6 +47,7 @@
             />
         <!-- 搜索城市 -->
         <activity android:name=".ui.activity.city.SearchCityActivity"
+                  android:windowSoftInputMode="stateAlwaysHidden"
             android:screenOrientation="portrait"
             />
 

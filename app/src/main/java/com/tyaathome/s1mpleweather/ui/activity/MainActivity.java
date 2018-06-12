@@ -1,5 +1,6 @@
 package com.tyaathome.s1mpleweather.ui.activity;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -9,12 +10,16 @@ import android.widget.TextView;
 
 import com.tyaathome.s1mpleweather.R;
 import com.tyaathome.s1mpleweather.model.annonations.inject.LayoutID;
+import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
+import com.tyaathome.s1mpleweather.model.constant.IntentExtraConstant;
 import com.tyaathome.s1mpleweather.mvp.base.BasePresenter;
 import com.tyaathome.s1mpleweather.mvp.contract.MainContract;
 import com.tyaathome.s1mpleweather.mvp.presenter.MainPresenter;
 import com.tyaathome.s1mpleweather.ui.adapter.city.CityFragmentAdapter;
 
 import java.util.List;
+
+import static com.tyaathome.s1mpleweather.model.constant.ActivityRequestCodeConstant.GOTO_SELECT_CITY;
 
 /**
  * 首页
@@ -66,6 +71,32 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     @Override
     public void setCityList(List<String> cityList) {
         adapter.setData(cityList);
+    }
+
+    @Override
+    public void selectResult(Intent intent) {
+        boolean isFresh = intent.getBooleanExtra(IntentExtraConstant.EXTRA_IS_REFRESH_MAIN_CITY_LIST, false);
+        if(isFresh) {
+            CityBean cityBean = (CityBean) intent.getSerializableExtra(IntentExtraConstant.EXTRA_SELECTED_CITY);
+            presenter.updateCityList(cityBean);
+        }
+    }
+
+    @Override
+    public void setPagerCurrentItem(int position) {
+        viewPager.setCurrentItem(position);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case GOTO_SELECT_CITY:
+                    selectResult(data);
+                    break;
+            }
+        }
     }
 
     private View.OnClickListener onClickListener = v -> {

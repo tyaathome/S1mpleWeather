@@ -5,4 +5,5 @@
     <color name="colorAccent">#FF4081</color>
     <color name="bg_default">#3176b5</color>
     <color name="colorWhite">#FFFFFF</color>
+    <color name="colorBuleLight">#55FFF9</color>
 </resources>

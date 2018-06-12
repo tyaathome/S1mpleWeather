@@ -94,10 +94,20 @@ public class MyConverterFactory extends Converter.Factory{
             if (response == null) {
                 return null;
             }
+            Realm realm = Realm.getDefaultInstance();
             try {
-                response.fillData(Realm.getDefaultInstance(), new JSONObject(bodyJson));
+                response.fillData(realm, new JSONObject(bodyJson));
             } catch (JSONException e) {
                 e.printStackTrace();
+            } finally {
+                if(realm != null) {
+                    if(realm.isInTransaction()) {
+                        realm.cancelTransaction();
+                    }
+                    if(!realm.isClosed()) {
+                        realm.close();
+                    }
+                }
             }
             Log.e(TAG, "down: " + json);
             return response;

@@ -14,11 +14,13 @@ public abstract class BasePackUp<T extends RealmObject> {
     abstract public String getName();
     abstract protected T queryData(Realm realm);
 
-    public T getCacheData(Realm realm) {
-        if(realm != null) {
-            T result = queryData(realm);
-            return realm.copyFromRealm(result);
+    public T getCacheData() {
+        Realm realm = Realm.getDefaultInstance();
+        T result = queryData(realm);
+        result = realm.copyFromRealm(result);
+        if(!realm.isClosed()) {
+            realm.close();
         }
-        return null;
+        return result;
     }
 }

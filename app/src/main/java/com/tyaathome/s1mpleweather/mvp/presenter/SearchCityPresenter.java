@@ -1,10 +1,14 @@
 package com.tyaathome.s1mpleweather.mvp.presenter;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.tyaathome.s1mpleweather.model.bean.city.CityBean;
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.SearchCityContract;
+import com.tyaathome.s1mpleweather.net.service.PackDataManager;
+import com.tyaathome.s1mpleweather.utils.CommonUtils;
+import com.tyaathome.s1mpleweather.utils.manager.AutoDownloadManager;
 import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 
 import java.util.List;
@@ -28,15 +32,18 @@ public class SearchCityPresenter implements SearchCityContract.Presenter {
 
     @Override
     public void start() {
-
+        CommonUtils.hideKeyboard((Activity) mContext);
     }
 
     @Override
     public void addCity(CityBean cityBean) {
-        CityTools.getInstance(mContext).addCityToSelectedList(cityBean.getId());
-        List<CityBean> cityList = CityTools.getInstance(mContext).getSelectedCityList();
-        if(cityList != null) {
-            mView.updateCityList(cityList);
+        if(cityBean != null) {
+            CityTools.getInstance(mContext).addCityToSelectedList(cityBean.getId());
+            List<CityBean> cityList = CityTools.getInstance(mContext).getSelectedCityList();
+            if (cityList != null) {
+                mView.updateCityList(cityList);
+            }
+            PackDataManager.requestList(AutoDownloadManager.getMainData(cityBean.getId()), () -> mView.gotoCity(cityBean, true));
         }
     }
 

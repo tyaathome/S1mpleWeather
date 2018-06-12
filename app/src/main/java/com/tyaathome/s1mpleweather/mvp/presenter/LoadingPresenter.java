@@ -7,6 +7,7 @@ import android.util.Log;
 import com.tyaathome.s1mpleweather.model.bean.city.LocationCityBean;
 import com.tyaathome.s1mpleweather.mvp.base.BaseView;
 import com.tyaathome.s1mpleweather.mvp.contract.LoadingContract;
+import com.tyaathome.s1mpleweather.net.service.PackDataManager;
 import com.tyaathome.s1mpleweather.utils.manager.AutoDownloadManager;
 import com.tyaathome.s1mpleweather.utils.manager.ObservableManager;
 import com.tyaathome.s1mpleweather.utils.tools.CityTools;
@@ -18,8 +19,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observable;
 import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.Observer;
-import io.reactivex.disposables.Disposable;
 
 /**
  * loading presenter
@@ -73,30 +72,32 @@ public class LoadingPresenter implements LoadingContract.Presenter {
         Observable dataObservable = Observable.create(emitter -> {
             LocationCityBean city = CityTools.getInstance(mContext).getLocationCity();
             if (city != null) {
-                ObservableManager
-                        .getZipObservable(AutoDownloadManager.getMainData(city.getId()))
-                        .timeout(3, TimeUnit.SECONDS, Observable.empty())
-                        .subscribe(new Observer<Object>() {
-                            @Override
-                            public void onSubscribe(Disposable d) {
+                PackDataManager.requestList(AutoDownloadManager.getMainData(city.getId()), () -> mView.gotoNextActivity());
 
-                            }
 
-                            @Override
-                            public void onNext(Object o) {
-
-                            }
-
-                            @Override
-                            public void onError(Throwable e) {
-                                mView.gotoNextActivity();
-                            }
-
-                            @Override
-                            public void onComplete() {
-                                mView.gotoNextActivity();
-                            }
-                        });
+//                PackDataManager.zipRequest(AutoDownloadManager.getMainData(city.getId()))
+//                        .timeout(3, TimeUnit.SECONDS, Observable.empty())
+//                        .subscribe(new Observer<Object>() {
+//                            @Override
+//                            public void onSubscribe(Disposable d) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onNext(Object o) {
+//
+//                            }
+//
+//                            @Override
+//                            public void onError(Throwable e) {
+//                                mView.gotoNextActivity();
+//                            }
+//
+//                            @Override
+//                            public void onComplete() {
+//                                mView.gotoNextActivity();
+//                            }
+//                        });
             } else {
                 emitter.onComplete();
             }

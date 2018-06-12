@@ -1,5 +1,6 @@
 package com.tyaathome.s1mpleweather.utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.content.res.Resources;
@@ -9,6 +10,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -98,9 +100,11 @@ public class CommonUtils {
      * @return
      */
     public static int getViewLocationY(View view) {
-        int[] location = getViewLocation(view);
-        if(location.length == 2) {
-            return location[1];
+        if(view != null) {
+            int[] location = getViewLocation(view);
+            if (location.length == 2) {
+                return location[1];
+            }
         }
         return 0;
     }
@@ -264,5 +268,13 @@ public class CommonUtils {
         return bitmapDrawable;
     }
 
+    public static void hideKeyboard(Activity activity) {
+        if(activity != null && activity.getCurrentFocus() != null) {
+            InputMethodManager imm = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+            if(imm != null) {
+                imm.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+            }
+        }
+    }
 
 }
