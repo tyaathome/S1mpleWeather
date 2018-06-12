@@ -14,6 +14,7 @@ import com.tyaathome.s1mpleweather.utils.tools.CityTools;
 import com.tyaathome.s1mpleweather.utils.tools.LocationTools;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -72,7 +73,17 @@ public class LoadingPresenter implements LoadingContract.Presenter {
         Observable dataObservable = Observable.create(emitter -> {
             LocationCityBean city = CityTools.getInstance(mContext).getLocationCity();
             if (city != null) {
-                PackDataManager.requestList(AutoDownloadManager.getMainData(city.getId()), () -> mView.gotoNextActivity());
+                // 获取上次请求数据时间，如果不是默认请求数据时间，说明已有缓存数据，则不请求直接跳转activity
+                Date requestData = CityTools.getInstance(mContext).getCityRequestTime(city.getId());
+                if(requestData.getTime() == 0) {
+                    PackDataManager.requestList(AutoDownloadManager.getMainData(city.getId()), () -> {
+                                CityTools.getInstance(mContext).setCityRequestTime(city.getId());
+                                mView.gotoNextActivity();
+                            }
+                    );
+                } else {
+                    mView.gotoNextActivity();
+                }
 
 
 //                PackDataManager.zipRequest(AutoDownloadManager.getMainData(city.getId()))

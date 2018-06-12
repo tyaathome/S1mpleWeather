@@ -34,6 +34,7 @@ public class CityFragment extends BaseFragment implements CityContract.View {
     private ForecastViewController forecastViewController;
     public ScrollView scrollView;
     private PtrFrameLayout mPtrFrame;
+    private String cityId = "";
 
     @Override
     protected BasePresenter onLoadPresenter() {
@@ -43,11 +44,14 @@ public class CityFragment extends BaseFragment implements CityContract.View {
 
     @Override
     public void initViews(Bundle savedInstanceState) {
+        Bundle bundle = getArguments();
+        cityId = bundle.getString("key", "");
         rootLayout = findViewById(R.id.layout_root);
         initRefresh();
         Objects.requireNonNull(getView()).post(() -> {
             initViewController();
-            requestData();
+            //requestData();
+            presenter.getData(cityId);
         });
     }
 
@@ -75,7 +79,7 @@ public class CityFragment extends BaseFragment implements CityContract.View {
     private void initRefresh() {
         scrollView = findViewById(R.id.scrollview);
         mPtrFrame = findViewById(R.id.refresh);
-        LoadMoreHeadView headView = new LoadMoreHeadView(getContext());
+        LoadMoreHeadView headView = new LoadMoreHeadView(getContext(), cityId);
         mPtrFrame.setHeaderView(headView);
         mPtrFrame.addPtrUIHandler(headView);
         //mPtrFrame.setLastUpdateTimeRelateObject(this);
@@ -87,7 +91,8 @@ public class CityFragment extends BaseFragment implements CityContract.View {
 
             @Override
             public void onRefreshBegin(PtrFrameLayout frame) {
-                //requestData(true);
+                //requestData();
+                presenter.getNetData(cityId);
             }
         });
     }
@@ -96,11 +101,7 @@ public class CityFragment extends BaseFragment implements CityContract.View {
      * 请求数据
      */
     private void requestData() {
-        Bundle bundle = getArguments();
-        if(bundle != null) {
-            String key = bundle.getString("key", "");
-            presenter.getData(key);
-        }
+        presenter.getData(cityId);
     }
 
     @Override
@@ -115,6 +116,7 @@ public class CityFragment extends BaseFragment implements CityContract.View {
                 forecastViewController.fillData(forecastEntity);
             }
         }
+        mPtrFrame.refreshComplete();
     }
 
 }

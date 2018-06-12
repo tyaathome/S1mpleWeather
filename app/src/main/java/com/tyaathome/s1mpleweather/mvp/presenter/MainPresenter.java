@@ -51,15 +51,20 @@ public class MainPresenter implements MainContract.Presenter {
     @Override
     public void start() {
         initBackgroundObservable();
+        // 第一次进入默认选中第一个城市
         updateCityList(null);
     }
 
-    private void preperBackgroundData(String cityid) {
+    private void preperBackgroundData(String cityid, boolean isDelay) {
         if(!TextUtils.isEmpty(cityid)) {
-            if(mEmitter != null && !mEmitter.isDisposed()) {
-                mEmitter.onNext(cityid);
+            if(isDelay) {
+                if (mEmitter != null && !mEmitter.isDisposed()) {
+                    mEmitter.onNext(cityid);
+                } else {
+                    initBackgroundObservable();
+                }
             } else {
-                initBackgroundObservable();
+                mView.setBackground(getCurrentWeatherById(cityid));
             }
         }
     }
@@ -95,10 +100,10 @@ public class MainPresenter implements MainContract.Presenter {
     }
 
     @Override
-    public void selectPage(int position) {
+    public void selectPage(int position, boolean isDelay) {
         if(selectedCityList.size()> position) {
             String cityId = selectedCityList.get(position);
-            preperBackgroundData(cityId);
+            preperBackgroundData(cityId, isDelay);
             searchCityNameById(cityId);
             mView.setPagerCurrentItem(position);
         }
@@ -126,13 +131,11 @@ public class MainPresenter implements MainContract.Presenter {
         selectedCityList.addAll(cityIdList);
         mView.setCityList(selectedCityList);
         if(cityBean == null) {
-            selectPage(0);
-            //mView.setPagerCurrentItem(0);
+            selectPage(0, false);
         } else {
             for(int i = 0; i < selectedCityList.size(); i++) {
                 String id = selectedCityList.get(i);
                 if(id.equals(cityBean.getId())) {
-                    //selectPage(i);
                     mView.setPagerCurrentItem(i);
                 }
             }
@@ -154,19 +157,26 @@ public class MainPresenter implements MainContract.Presenter {
                 //.skip(1)
                 .throttleWithTimeout(500, TimeUnit.MILLISECONDS)
                 .observeOn(Schedulers.io())
-                .map(s -> {
-                    WeekWeatherPackUp up = new WeekWeatherPackUp(s);
-                    WeekWeatherBean bean = up.getCacheData();
-                    if(bean != null && bean.getWeek() != null && bean.getWeek().size() > 1) {
-                        WeekWeatherInfoBean infoBean =  bean.getWeek().get(1);
-                        if(infoBean != null && !TextUtils.isEmpty(infoBean.getWd_day_ico())) {
-                            String ico = infoBean.getWd_day_ico();
-                            return CommonUtils.getWeatherBackground(mContext, ico);
-                        }
-                    }
-                    return null;
-                })
+                .map(this::getCurrentWeatherById)
                 .observeOn(AndroidSchedulers.mainThread());
+    }
+
+    /**
+     * 通过城市id获取天气图片
+     * @param cityid
+     * @return
+     */
+    private BitmapDrawable getCurrentWeatherById(String cityid) {
+        WeekWeatherPackUp up = new WeekWeatherPackUp(cityid);
+        WeekWeatherBean bean = up.getCacheData();
+        if(bean != null && bean.getWeek() != null && bean.getWeek().size() > 1) {
+            WeekWeatherInfoBean infoBean =  bean.getWeek().get(1);
+            if(infoBean != null && !TextUtils.isEmpty(infoBean.getWd_day_ico())) {
+                String ico = infoBean.getWd_day_ico();
+                return CommonUtils.getWeatherBackground(mContext, ico);
+            }
+        }
+        return null;
     }
 
     private Observer<BitmapDrawable> observer = new Observer<BitmapDrawable>() {

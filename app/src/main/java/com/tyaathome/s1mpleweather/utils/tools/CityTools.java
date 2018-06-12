@@ -14,6 +14,7 @@ import com.tyaathome.s1mpleweather.utils.RealmUtils;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 
@@ -241,6 +242,50 @@ public class CityTools {
                     .contains("pinyin_simple", key, Case.INSENSITIVE)
                     .findAll();
             return RealmUtils.unmanage(cityBeanList);
+        }
+        return null;
+    }
+
+    /**
+     * 设置城市请求数据时间
+     * @param cityid
+     */
+    public void setCityRequestTime(String cityid) {
+        if(!TextUtils.isEmpty(cityid)) {
+            Realm realm = Realm.getDefaultInstance();
+            CityBean cityBean = realm.where(CityBean.class).equalTo("id", cityid).findFirst();
+            if(cityBean != null) {
+                try {
+                    realm.beginTransaction();
+                    cityBean.setUpdateTime(new Date());
+                    realm.commitTransaction();
+                } catch (Exception e) {
+                    if(realm.isInTransaction()) {
+                        realm.cancelTransaction();
+                    }
+                } finally {
+                    if(!realm.isClosed()) {
+                        realm.close();
+                    }
+                }
+
+            }
+        }
+    }
+
+    /**
+     * 获取城市请求数据时间
+     * @param cityid
+     * @return
+     */
+    public Date getCityRequestTime(String cityid) {
+        if(!TextUtils.isEmpty(cityid)) {
+            Realm realm = Realm.getDefaultInstance();
+            CityBean cityBean = realm.where(CityBean.class).equalTo("id", cityid).findFirst();
+            if(cityBean != null) {
+                cityBean = RealmUtils.unmanage(cityBean);
+                return cityBean.getUpdateTime();
+            }
         }
         return null;
     }

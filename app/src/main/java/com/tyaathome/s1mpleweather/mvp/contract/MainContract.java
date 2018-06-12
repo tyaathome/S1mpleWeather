@@ -20,7 +20,8 @@ public interface MainContract {
     }
 
     interface Presenter extends BasePresenter {
-        void selectPage(int position);
+        // 设置背景图片时是否延迟
+        void selectPage(int position, boolean isDelay);
         void gotoSelectCity();
         // 刷新城市列表选项卡
         void updateCityList(CityBean cityBean);

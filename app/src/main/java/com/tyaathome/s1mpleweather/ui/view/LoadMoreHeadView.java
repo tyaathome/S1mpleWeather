@@ -2,12 +2,18 @@ package com.tyaathome.s1mpleweather.ui.view;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.tyaathome.s1mpleweather.R;
+import com.tyaathome.s1mpleweather.utils.tools.CityTools;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import in.srain.cube.views.ptr.PtrFrameLayout;
 import in.srain.cube.views.ptr.PtrUIHandler;
@@ -21,15 +27,17 @@ public class LoadMoreHeadView extends FrameLayout implements PtrUIHandler {
 
     private Context context;
     private TextView tvTop, tvBottom;
+    private String cityId;
 
     public static final String DROP_DOWN_TO_REFRESH = "下拉刷新";
     public static final String RELEASE_TO_REFRESH = "松开刷新";
     public static final String REFRESHING = "正在刷新";
     public static final String REFRESH_COMPELETE = "刷新完成";
 
-    public LoadMoreHeadView(@NonNull Context context) {
+    public LoadMoreHeadView(@NonNull Context context, String cityId) {
         super(context);
         this.context = context;
+        this.cityId = cityId;
         initViews();
     }
 
@@ -47,27 +55,41 @@ public class LoadMoreHeadView extends FrameLayout implements PtrUIHandler {
         LayoutInflater.from(context).inflate(R.layout.layout_refresh_head_view, this);
         tvTop = findViewById(R.id.top);
         tvBottom = findViewById(R.id.bottom);
-        tvTop.setText(DROP_DOWN_TO_REFRESH);
+        tvBottom.setText(DROP_DOWN_TO_REFRESH);
+        tvTop.setVisibility(VISIBLE);
+        tvBottom.setVisibility(VISIBLE);
     }
 
     @Override
     public void onUIReset(PtrFrameLayout frame) {
-        tvTop.setText(DROP_DOWN_TO_REFRESH);
+        tvBottom.setText(DROP_DOWN_TO_REFRESH);
+        //tvTop.setVisibility(GONE);
+        tvBottom.setVisibility(VISIBLE);
     }
 
     @Override
     public void onUIRefreshPrepare(PtrFrameLayout frame) {
-        tvTop.setText(DROP_DOWN_TO_REFRESH);
+        tvBottom.setText(DROP_DOWN_TO_REFRESH);
+        //tvTop.setVisibility(GONE);
+        tvBottom.setVisibility(VISIBLE);
     }
 
     @Override
     public void onUIRefreshBegin(PtrFrameLayout frame) {
-        tvTop.setText(REFRESHING);
+        String time = getTime();
+        if(!TextUtils.isEmpty(time)) {
+            tvTop.setText(time);
+            tvBottom.setText(REFRESHING);
+        } else {
+            tvBottom.setText(REFRESHING);
+        }
+        tvTop.setVisibility(VISIBLE);
+        tvBottom.setVisibility(VISIBLE);
     }
 
     @Override
     public void onUIRefreshComplete(PtrFrameLayout frame) {
-        tvTop.setText(REFRESH_COMPELETE);
+        tvBottom.setText(REFRESH_COMPELETE);
     }
 
     @Override
@@ -78,12 +100,21 @@ public class LoadMoreHeadView extends FrameLayout implements PtrUIHandler {
 
         if (currentPos < mOffsetToRefresh && lastPos >= mOffsetToRefresh) {
             if (isUnderTouch && status == PtrFrameLayout.PTR_STATUS_PREPARE) {
-                tvTop.setText(DROP_DOWN_TO_REFRESH);
+                tvBottom.setText(DROP_DOWN_TO_REFRESH);
             }
         } else if (currentPos > mOffsetToRefresh && lastPos <= mOffsetToRefresh) {
             if (isUnderTouch && status == PtrFrameLayout.PTR_STATUS_PREPARE) {
-                tvTop.setText(RELEASE_TO_REFRESH);
+                tvBottom.setText(RELEASE_TO_REFRESH);
             }
         }
+    }
+
+    private String getTime() {
+        Date date = CityTools.getInstance(context).getCityRequestTime(cityId);
+        if(date != null) {
+            SimpleDateFormat format = new SimpleDateFormat("hh:mm 更新", Locale.getDefault());
+            return format.format(date);
+        }
+        return "";
     }
 }

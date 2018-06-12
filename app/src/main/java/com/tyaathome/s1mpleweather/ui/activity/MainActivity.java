@@ -33,7 +33,6 @@ public class MainActivity extends BaseActivity implements MainContract.View {
     private TextView tvCityName;
     private ViewGroup layoutRoot;
     private ViewGroup layoutTitle;
-    private int count = 5;
 
     @Override
     protected BasePresenter onLoadPresenter() {
@@ -116,7 +115,7 @@ public class MainActivity extends BaseActivity implements MainContract.View {
 
         @Override
         public void onPageSelected(int position) {
-            presenter.selectPage(position);
+            presenter.selectPage(position, true);
         }
 
         @Override

@@ -13,7 +13,10 @@ public interface CityContract {
     }
 
     interface Presenter extends BasePresenter {
+        // 智能获取数据(缓存或网络)
         void getData(String key);
+        // 获取网络数据
+        void getNetData(String key);
     }
 
 }

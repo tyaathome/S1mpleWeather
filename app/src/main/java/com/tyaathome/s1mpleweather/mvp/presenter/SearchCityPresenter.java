@@ -43,7 +43,10 @@ public class SearchCityPresenter implements SearchCityContract.Presenter {
             if (cityList != null) {
                 mView.updateCityList(cityList);
             }
-            PackDataManager.requestList(AutoDownloadManager.getMainData(cityBean.getId()), () -> mView.gotoCity(cityBean, true));
+            PackDataManager.requestList(AutoDownloadManager.getMainData(cityBean.getId()), () -> {
+                CityTools.getInstance(mContext).setCityRequestTime(cityBean.getId());
+                mView.gotoCity(cityBean, true);
+            });
         }
     }
 

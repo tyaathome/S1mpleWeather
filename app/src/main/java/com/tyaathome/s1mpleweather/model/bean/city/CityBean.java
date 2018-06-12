@@ -1,8 +1,10 @@
 package com.tyaathome.s1mpleweather.model.bean.city;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * Created by tyaathome on 2018/2/28.
@@ -10,6 +12,7 @@ import io.realm.RealmObject;
 
 public class CityBean extends RealmObject implements Serializable {
     // 城市id
+    @PrimaryKey
     private String id = "";
     // 父id
     private String parent_id = "";
@@ -23,6 +26,8 @@ public class CityBean extends RealmObject implements Serializable {
     private String pinyin = "";
     // 简拼
     private String pinyin_simple = "";
+    // 更新时间
+    private Date updateTime = new Date(0);
 
     public String getId() {
         return id;
@@ -80,4 +85,11 @@ public class CityBean extends RealmObject implements Serializable {
         this.pinyin_simple = pinyin_simple;
     }
 
+    public Date getUpdateTime() {
+        return updateTime;
+    }
+
+    public void setUpdateTime(Date updateTime) {
+        this.updateTime = updateTime;
+    }
 }
